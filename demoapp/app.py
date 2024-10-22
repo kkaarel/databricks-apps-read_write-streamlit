@@ -28,25 +28,18 @@ with st.expander("Environment variables"):
 
 host = headers["DATABRICKS_HOST"]
 
-st.write(f"header host {host}")
-
-def sqlQuery(query: str) -> pd.DataFrame:
-    #cfg = Config() # Pull environment variables for auth
-    with sql.connect(
-        server_hostname=headers["DATABRICKS_HOST"],
-        http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
-        credentials_provider=lambda: cfg.authenticate
-    ) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            return cursor.fetchall_arrow().to_pandas()
-
+ databricks_host = os.getenv('DATABRICKS_HOST', 'Not Found')
+ st.write(databricks_host)
 
 st.write("Host Path:", headers["DATABRICKS_HOST"])
 st.write("ID:", headers["DATABRICKS_WAREHOUSE_ID"])
 
 DATABRICKS_WAREHOUSE_ID  = headers["DATABRICKS_WAREHOUSE_ID"]
 host = headers["DATABRICKS_HOST"]
+
+
+
+
 
 def credential_provider():
   config = Config(
