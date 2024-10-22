@@ -31,6 +31,7 @@ client_id = os.getenv("DATABRICKS_CLIENT_ID", "Not Found")
 host = os.getenv("DATABRICKS_HOST", "Not Found")
 warehouse_id = os.getenv("DATABRICKS_WAREHOUSE_ID", "Not Found")
 
+
 # Display the extracted environment variables
 st.write("App Name:", app_name)
 st.write("Client ID:", client_id)
@@ -43,12 +44,12 @@ st.write("Warehouse ID:", warehouse_id)
 def credential_provider():
   config = Config(
     host          = f"https://{host}",
-    client_id     = headers["DATABRICKS_CLIENT_ID"],
-    client_secret = headers["DATABRICKS_CLIENT_SECRET"])
+    client_id     = os.getenv("DATABRICKS_CLIENT_ID"),
+    client_secret = os.getenv("DATABRICKS_CLIENT_SECRET"))
   return oauth_service_principal(config)
 
 with sql.connect(server_hostname      = host,
-                 http_path            = f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
+                 http_path            = f"/sql/1.0/warehouses/{warehouse_id}",
                  credentials_provider = credential_provider) as connection:
     st.write("Successfully connected to Databricks SQL Warehouse")
 
