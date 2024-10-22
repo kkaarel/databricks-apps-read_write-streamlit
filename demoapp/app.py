@@ -7,7 +7,7 @@ import os
 
 
 st.set_page_config(
-    layout="wide"
+    layout="wide",
     page_title="Write and update yoru refrence tables in Databricks",
     page_icon="👋",
     menu_items={
