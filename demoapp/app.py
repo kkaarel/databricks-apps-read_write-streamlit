@@ -26,17 +26,16 @@ with st.expander("Headers"):
 with st.expander("Environment variables"):
     st.write(dict(os.environ))
 
-host = headers["DATABRICKS_HOST"]
+app_name = os.getenv("DATABRICKS_APP_NAME", "Not Found")
+client_id = os.getenv("DATABRICKS_CLIENT_ID", "Not Found")
+host = os.getenv("DATABRICKS_HOST", "Not Found")
+warehouse_id = os.getenv("DATABRICKS_WAREHOUSE_ID", "Not Found")
 
-databricks_host = os.getenv('DATABRICKS_HOST', 'Not Found')
-st.write(databricks_host)
-
-st.write("Host Path:", headers["DATABRICKS_HOST"])
-st.write("ID:", headers["DATABRICKS_WAREHOUSE_ID"])
-
-DATABRICKS_WAREHOUSE_ID  = headers["DATABRICKS_WAREHOUSE_ID"]
-host = headers["DATABRICKS_HOST"]
-
+# Display the extracted environment variables
+st.write("App Name:", app_name)
+st.write("Client ID:", client_id)
+st.write("Host:", host)
+st.write("Warehouse ID:", warehouse_id)
 
 
 
