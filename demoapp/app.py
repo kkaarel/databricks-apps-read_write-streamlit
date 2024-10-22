@@ -18,9 +18,21 @@ def sqlQuery(query: str) -> pd.DataFrame:
             cursor.execute(query)
             return cursor.fetchall_arrow().to_pandas()
 
+def get_user_info():
+    headers = st.context.headers
+    return dict(
+        user_name=headers.get("X-Forwarded-Preferred-Username"),
+        user_email=headers.get("X-Forwarded-Email"),
+        user_id=headers.get("X-Forwarded-User"),
+    )
+ 
+user_info = get_user_info()
+
+
+
 st.set_page_config(layout="wide")
 
-@st.cache_data(ttl=30)  # only re-query if it's been 30 seconds
+@st.cache_data(ttl=200)  # only re-query if it's been 30 seconds
 def getData():
     # This example query depends on the nyctaxi data set in Unity Catalog, see https://docs.databricks.com/en/discover/databricks-datasets.html for details
     return sqlQuery("select * from app_dev.default.people ")
@@ -28,3 +40,36 @@ def getData():
 data = getData()
 
 st.write(data)
+
+user_info = get_user_info()
+
+st.write(user_info)
+
+
+
+# Create a form to collect user information
+with st.form(key='user_form'):
+    # Dynamically create input fields based on data columns
+    inputs = {}
+    for column in data.columns:
+        # Assuming the data is composed of simple data types like text and numbers
+        inputs[column] = st.text_input(label=column)
+
+    # Add a submission button
+    submit_button = st.form_submit_button(label='Submit')
+
+# Handle the form submission
+if submit_button:
+    # Collect the inputs into a DataFrame
+    user_input_data = pd.DataFrame([inputs])
+    st.write('Submitted Data:')
+    st.write(user_input_data)
+
+    # Combine user_input_data with existing data and display
+    combined_data = pd.concat([data, user_input_data], ignore_index=True)
+    st.write('Updated Data:')
+    st.write(combined_data)
+
+
+
+
