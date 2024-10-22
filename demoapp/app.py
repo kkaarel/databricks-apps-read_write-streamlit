@@ -33,23 +33,24 @@ def sqlQuery(query: str) -> pd.DataFrame:
             return cursor.fetchall_arrow().to_pandas()
 
 
-
 @st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
-    # This example query depends on the nyctaxi data set in Unity Catalog, see https://docs.databricks.com/en/discover/databricks-datasets.html for details
-    return sqlQuery("select * from samples.nyctaxi.trips limit 5000")
+    # Update query to use the new people table
+    return sqlQuery("select * from app_dev.default.people limit 5000")
 
 data = getData()
 
-st.header("Taxi fare distribution !!! :)")
+st.header("People Data Distribution")
 col1, col2 = st.columns([3, 1])
+
 with col1:
-    st.scatter_chart(data=data, height=400, width=700, y="fare_amount", x="trip_distance")
+    st.subheader("Age vs. ID")
+    st.scatter_chart(data=data, height=400, width=700, y="age", x="id")
+
 with col2:
-    st.subheader("Predict fare")
-    pickup = st.text_input("From (zipcode)", value="10003")
-    dropoff = st.text_input("To (zipcode)", value="11238")
-    d = data[(data['pickup_zip'] == int(pickup)) & (data['dropoff_zip'] == int(dropoff))]
-    st.write(f"# **${d['fare_amount'].mean() if len(d) > 0 else 99:.2f}**")
+    st.subheader("Search Person by Name")
+    name = st.text_input("Name")
+    person = data[(data['name'].str.contains(name, case=False))]
+    st.write(f"# **{person.iloc[0]['email'] if len(person) > 0 else 'No match found'}**")
 
 st.dataframe(data=data, height=600, use_container_width=True)
