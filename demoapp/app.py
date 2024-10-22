@@ -28,8 +28,8 @@ with st.expander("Environment variables"):
 
 host = headers["DATABRICKS_HOST"]
 
- databricks_host = os.getenv('DATABRICKS_HOST', 'Not Found')
- st.write(databricks_host)
+databricks_host = os.getenv('DATABRICKS_HOST', 'Not Found')
+st.write(databricks_host)
 
 st.write("Host Path:", headers["DATABRICKS_HOST"])
 st.write("ID:", headers["DATABRICKS_WAREHOUSE_ID"])
