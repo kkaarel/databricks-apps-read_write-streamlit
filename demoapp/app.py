@@ -74,6 +74,7 @@ if submit_button:
         with connection.cursor() as cursor:
             # Assuming data columns match table columns
             table_name = "app_dev.default.people"
+            st.write(f"INSERT INTO {table_name} VALUES {tuple(user_input_data.iloc[0])}")
             cursor.execute(f"INSERT INTO {table_name} VALUES {tuple(user_input_data.iloc[0])}")
 
     # Combine user_input_data with existing data and display
