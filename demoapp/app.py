@@ -56,7 +56,7 @@ if filtered_df.empty:
 else:
     st.write("Rows that are selected and need an update")
 
-    st.data(filtered_df)
+    st.dataframe(filtered_df)
 
 
 
