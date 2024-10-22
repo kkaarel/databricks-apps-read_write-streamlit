@@ -14,7 +14,18 @@ st.set_page_config(
 # Ensure environment variable is set correctly
 #assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
 
-DATABRICKS_WAREHOUSE_ID = "38c9b53fe30ba3a0"  #st.write(os.getenv('DATABRICKS_WAREHOUSE_ID'))
+#DATABRICKS_WAREHOUSE_ID = "38c9b53fe30ba3a0"  #st.write(os.getenv('DATABRICKS_WAREHOUSE_ID'))
+
+
+DATABRICKS_WAREHOUSE_ID = st.text_input(
+    "Enter Databricks Warehouse ID:",
+    value=os.getenv('DATABRICKS_WAREHOUSE_ID', ''),
+    help="Please provide the Databricks Warehouse ID if it's not set as an environment variable."
+)
+
+if not DATABRICKS_WAREHOUSE_ID:
+    st.error("DATABRICKS_WAREHOUSE_ID must be provided.")
+    st.stop()
 
 st.write(os.environ)
 
