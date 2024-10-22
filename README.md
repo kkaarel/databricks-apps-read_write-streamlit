@@ -35,7 +35,7 @@ You don't really need to configure anything to the file.
 This application is a demo and provided as-is. Please validate the code and configuration settings according to your environment and security practices before deploying in a production environment.
 
 
-Databricks official documentaion about apps: 
+Databricks official documentation about apps: 
 
 [What are data apps](https://docs.databricks.com/en/dev-tools/databricks-apps/index.html)
 
