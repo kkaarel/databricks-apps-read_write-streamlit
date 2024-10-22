@@ -21,17 +21,23 @@ except FileNotFoundError:
 
 
 def sqlQuery(query: str) -> pd.DataFrame:
-    cfg = Config() # Pull environment variables for auth
+    cfg = Config()  # Pull environment variables for auth
     DATABRICKS_WAREHOUSE_ID = st.secrets["DATABRICKS_WAREHOUSE_ID"]
-    with sql.connect(
-        server_hostname=cfg.host,
-        http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
-        credentials_provider=lambda: cfg.authenticate
-    ) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            return cursor.fetchall_arrow().to_pandas()
 
+    try:
+        st.write(f"Connecting to Databricks at {cfg.host} with warehouse ID: {DATABRICKS_WAREHOUSE_ID}")
+        with sql.connect(
+            server_hostname=cfg.host,
+            http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
+            credentials_provider=lambda: cfg.authenticate
+        ) as connection:
+            st.write("Connection established successfully.")
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                return cursor.fetchall_arrow().to_pandas()
+    except Exception as e:
+        st.error(f"Error during SQL query execution: {e}")
+        raise
 
 @st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
