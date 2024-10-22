@@ -42,8 +42,8 @@ def sqlQuery(query: str) -> pd.DataFrame:
             return cursor.fetchall_arrow().to_pandas()
 
 
-st.write("Host Path:", headers]"DATABRICKS_HOST"])
-st.write("ID :", headers]"DATABRICKS_WAREHOUSE_ID"])
+st.write("Host Path:", headers["DATABRICKS_HOST"])
+st.write("ID:", headers["DATABRICKS_WAREHOUSE_ID"])
 
 DATABRICKS_WAREHOUSE_ID  = headers]"DATABRICKS_WAREHOUSE_ID"]
 host = headers["DATABRICKS_HOST"]
