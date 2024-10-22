@@ -61,7 +61,8 @@ else:
     st.write("Validate selected rows and update")
 
     st.dataframe(filtered_df)
-
+    update_button = st.button('Update Rows')
+    
     if update_button:
         st.write("Updating rows...")
         cfg = Config()
