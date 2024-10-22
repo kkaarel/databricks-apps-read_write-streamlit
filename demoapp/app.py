@@ -26,6 +26,10 @@ with st.expander("Headers"):
 with st.expander("Environment variables"):
     st.write(dict(os.environ))
 
+host = headers["DATABRICKS_HOST"]
+
+st.write(f"header host {host}")
+
 def sqlQuery(query: str) -> pd.DataFrame:
     #cfg = Config() # Pull environment variables for auth
     with sql.connect(
@@ -38,11 +42,11 @@ def sqlQuery(query: str) -> pd.DataFrame:
             return cursor.fetchall_arrow().to_pandas()
 
 st.write("Server Hostname:", server_hostname)
-st.write("HTTP Path:", os.getenv("DATABRICKS_HTTP_PATH"))
+st.write("Host Path:", os.getenv("DATABRICKS_HOST"))
 
 def credential_provider():
   config = Config(
-    host          = f"https://{headers["DATABRICKS_HOST"]}",
+    host          = f"https://{host}",
     client_id     = os.getenv("DATABRICKS_CLIENT_ID"),
     client_secret = os.getenv("DATABRICKS_CLIENT_SECRET"))
   return oauth_service_principal(config)
