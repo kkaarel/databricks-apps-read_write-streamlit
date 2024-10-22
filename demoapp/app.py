@@ -9,14 +9,23 @@ st.set_page_config(layout="wide")
 
 
 
-assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
+#assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
+
+# Ensure that secrets are correctly set up
+try:
+    DATABRICKS_WAREHOUSE_ID = st.secrets["DATABRICKS_WAREHOUSE_ID"]
+    st.write("DATABRICKS_WAREHOUSE_ID:", DATABRICKS_WAREHOUSE_ID)
+except FileNotFoundError:
+    st.error("No secrets found. Please make sure that the secrets.toml file is properly configured.")
+    st.stop()
 
 
 def sqlQuery(query: str) -> pd.DataFrame:
     cfg = Config() # Pull environment variables for auth
+
     with sql.connect(
         server_hostname=cfg.host,
-        http_path=f"/sql/1.0/warehouses/{st.secrets["DATABRICKS_WAREHOUSE_ID"]}",
+        http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
         credentials_provider=lambda: cfg.authenticate
     ) as connection:
         with connection.cursor() as cursor:
