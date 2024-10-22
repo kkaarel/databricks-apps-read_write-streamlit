@@ -1,0 +1,11 @@
+command: [
+  "streamlit", 
+  "run",
+  "app.py"
+]
+
+env:
+  - name: "DATABRICKS_WAREHOUSE_ID"
+    valueFrom: "b4f83b6db9cd6a15"
+  - name: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+    value: "false"
