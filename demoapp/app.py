@@ -54,8 +54,8 @@ def credential_provider():
 with sql.connect(server_hostname      = server_hostname,
                  http_path            = os.getenv("DATABRICKS_HTTP_PATH"),
                  credentials_provider = credential_provider) as connection:
-
-
+    st.write("Successfully connected to Databricks SQL Warehouse")
+    
 @st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
     # Update query to use the new people table
