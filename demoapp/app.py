@@ -23,13 +23,21 @@ except FileNotFoundError:
 def sqlQuery(query: str) -> pd.DataFrame:
     cfg = Config()  # Pull environment variables for auth
     DATABRICKS_WAREHOUSE_ID = st.secrets["DATABRICKS_WAREHOUSE_ID"]
+    
+    # Add detailed logging
+    st.write(f"Using Databricks Host: {cfg.host}")
+    st.write(f"Using Databricks Warehouse ID: {DATABRICKS_WAREHOUSE_ID}")
 
     try:
-        st.write(f"Connecting to Databricks at {cfg.host} with warehouse ID: {DATABRICKS_WAREHOUSE_ID}")
+        # Ensure we have the bearer token or other authentication methods prepared
+        bearer_token = cfg.authenticate()
+        st.write(f"Successfully retrieved bearer token")
+
+        # Attempt connection using the bearer token explicitly
         with sql.connect(
             server_hostname=cfg.host,
             http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
-            credentials_provider=lambda: cfg.authenticate
+            access_token=bearer_token
         ) as connection:
             st.write("Connection established successfully.")
             with connection.cursor() as cursor:
