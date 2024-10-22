@@ -10,7 +10,7 @@ st.set_page_config(layout="wide")
 
 
 
-assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
+#assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
 
 # Ensure that secrets are correctly set up
 #try:
@@ -41,21 +41,25 @@ def sqlQuery(query: str) -> pd.DataFrame:
             cursor.execute(query)
             return cursor.fetchall_arrow().to_pandas()
 
-st.write("Server Hostname:", server_hostname)
-st.write("Host Path:", os.getenv("DATABRICKS_HOST"))
+
+st.write("Host Path:", headers]"DATABRICKS_HOST"])
+st.write("ID :", headers]"DATABRICKS_WAREHOUSE_ID"])
+
+DATABRICKS_WAREHOUSE_ID  = headers]"DATABRICKS_WAREHOUSE_ID"]
+host = headers["DATABRICKS_HOST"]
 
 def credential_provider():
   config = Config(
     host          = f"https://{host}",
-    client_id     = os.getenv("DATABRICKS_CLIENT_ID"),
-    client_secret = os.getenv("DATABRICKS_CLIENT_SECRET"))
+    client_id     = headers["DATABRICKS_CLIENT_ID"],
+    client_secret = headers["DATABRICKS_CLIENT_SECRET"])
   return oauth_service_principal(config)
 
-with sql.connect(server_hostname      = server_hostname,
-                 http_path            = os.getenv("DATABRICKS_HTTP_PATH"),
+with sql.connect(server_hostname      = host,
+                 http_path            = f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
                  credentials_provider = credential_provider) as connection:
     st.write("Successfully connected to Databricks SQL Warehouse")
-    
+
 @st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
     # Update query to use the new people table
