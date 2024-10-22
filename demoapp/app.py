@@ -20,6 +20,8 @@ assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be se
 #    st.error("No secrets found. Please make sure that the secrets.toml file is properly configured.")
 #    st.stop()
 
+headers = st.context.headers
+st.write(headers)
 
 def sqlQuery(query: str) -> pd.DataFrame:
     cfg = Config() # Pull environment variables for auth
@@ -31,6 +33,9 @@ def sqlQuery(query: str) -> pd.DataFrame:
         with connection.cursor() as cursor:
             cursor.execute(query)
             return cursor.fetchall_arrow().to_pandas()
+
+
+
 
 @st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
