@@ -4,6 +4,8 @@ import streamlit as st
 import pandas as pd
 import os
 
+
+st.set_page_config(layout="wide")
 # Ensure environment variable is set correctly
 assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
 
@@ -32,7 +34,7 @@ def sqlQuery(query: str) -> pd.DataFrame:
             return cursor.fetchall_arrow().to_pandas()
 
 
-st.set_page_config(layout="wide")
+
 
 @st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
