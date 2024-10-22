@@ -16,6 +16,8 @@ st.set_page_config(
 
 st.write(os.getenv('DATABRICKS_WAREHOUSE_ID'))
 
+st.write(os.environ)
+
 def get_user_info():
     headers = st.context.headers
     return dict(
