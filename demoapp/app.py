@@ -3,49 +3,34 @@ from databricks import sql
 from databricks.sdk.core import Config
 import streamlit as st
 import pandas as pd
+import requests
 
 # Ensure environment variable is set correctly
 st.set_page_config(layout="wide")
 
 
 
-#assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
+assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
 
 # Ensure that secrets are correctly set up
-try:
-    DATABRICKS_WAREHOUSE_ID = st.secrets["DATABRICKS_WAREHOUSE_ID"]
-    st.write("DATABRICKS_WAREHOUSE_ID:", DATABRICKS_WAREHOUSE_ID)
-except FileNotFoundError:
-    st.error("No secrets found. Please make sure that the secrets.toml file is properly configured.")
-    st.stop()
+#try:
+#    DATABRICKS_WAREHOUSE_ID = st.secrets["DATABRICKS_WAREHOUSE_ID"]
+#    st.write("DATABRICKS_WAREHOUSE_ID:", DATABRICKS_WAREHOUSE_ID)
+#except FileNotFoundError:
+#    st.error("No secrets found. Please make sure that the secrets.toml file is properly configured.")
+#    st.stop()
 
 
 def sqlQuery(query: str) -> pd.DataFrame:
-    cfg = Config()  # Pull environment variables for auth
-    DATABRICKS_WAREHOUSE_ID = st.secrets["DATABRICKS_WAREHOUSE_ID"]
-    
-    # Add detailed logging
-    st.write(f"Using Databricks Host: {cfg.host}")
-    st.write(f"Using Databricks Warehouse ID: {DATABRICKS_WAREHOUSE_ID}")
-
-    try:
-        # Ensure we have the bearer token or other authentication methods prepared
-        bearer_token = cfg.authenticate()
-        st.write(f"Successfully retrieved bearer token")
-
-        # Attempt connection using the bearer token explicitly
-        with sql.connect(
-            server_hostname=cfg.host,
-            http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
-            access_token=bearer_token
-        ) as connection:
-            st.write("Connection established successfully.")
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                return cursor.fetchall_arrow().to_pandas()
-    except Exception as e:
-        st.error(f"Error during SQL query execution: {e}")
-        raise
+    cfg = Config() # Pull environment variables for auth
+    with sql.connect(
+        server_hostname=cfg.host,
+        http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
+        credentials_provider=lambda: cfg.authenticate
+    ) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            return cursor.fetchall_arrow().to_pandas()
 
 @st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
