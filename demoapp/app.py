@@ -27,9 +27,9 @@ with st.expander("Environment variables"):
     st.write(dict(os.environ))
 
 def sqlQuery(query: str) -> pd.DataFrame:
-    cfg = Config() # Pull environment variables for auth
+    #cfg = Config() # Pull environment variables for auth
     with sql.connect(
-        server_hostname=cfg.host,
+        server_hostname=headers["DATABRICKS_HOST"],
         http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
         credentials_provider=lambda: cfg.authenticate
     ) as connection:
@@ -37,27 +37,22 @@ def sqlQuery(query: str) -> pd.DataFrame:
             cursor.execute(query)
             return cursor.fetchall_arrow().to_pandas()
 
+st.write("Server Hostname:", server_hostname)
+st.write("HTTP Path:", os.getenv("DATABRICKS_HTTP_PATH"))
 
+def credential_provider():
+  config = Config(
+    host          = f"https://{headers["DATABRICKS_HOST"]}",
+    client_id     = os.getenv("DATABRICKS_CLIENT_ID"),
+    client_secret = os.getenv("DATABRICKS_CLIENT_SECRET"))
+  return oauth_service_principal(config)
+
+with sql.connect(server_hostname      = server_hostname,
+                 http_path            = os.getenv("DATABRICKS_HTTP_PATH"),
+                 credentials_provider = credential_provider) as connection:
 
 
 @st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
     # Update query to use the new people table
     return sqlQuery("select * from app_dev.default.people limit 5000")
-
-data = getData()
-
-st.header("People Data Distribution")
-col1, col2 = st.columns([3, 1])
-
-with col1:
-    st.subheader("Age vs. ID")
-    st.scatter_chart(data=data, height=400, width=700, y="age", x="id")
-
-with col2:
-    st.subheader("Search Person by Name")
-    name = st.text_input("Name")
-    person = data[(data['name'].str.contains(name, case=False))]
-    st.write(f"# **{person.iloc[0]['email'] if len(person) > 0 else 'No match found'}**")
-
-st.dataframe(data=data, height=600, use_container_width=True)
