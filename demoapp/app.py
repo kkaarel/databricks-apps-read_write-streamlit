@@ -27,7 +27,7 @@ if not DATABRICKS_WAREHOUSE_ID:
     st.error("DATABRICKS_WAREHOUSE_ID must be provided.")
     st.stop()
 
-st.write(os.environ)
+#st.write(os.environ)
 
 def get_user_info():
     headers = st.context.headers
