@@ -14,7 +14,7 @@ st.set_page_config(
 # Ensure environment variable is set correctly
 #assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
 
-st.write(os.getenv('DATABRICKS_WAREHOUSE_ID'))
+DATABRICKS_WAREHOUSE_ID = "38c9b53fe30ba3a0"  #st.write(os.getenv('DATABRICKS_WAREHOUSE_ID'))
 
 st.write(os.environ)
 
@@ -38,7 +38,7 @@ def sqlQuery(query: str) -> pd.DataFrame:
     try:
         with sql.connect(
             server_hostname=cfg.host,
-            http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
+            http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
             credentials_provider=lambda: cfg.authenticate
         ) as connection:
             with connection.cursor() as cursor:
@@ -82,7 +82,7 @@ else:
         cfg = Config()
         with sql.connect(
             server_hostname=cfg.host,
-            http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
+            http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
             credentials_provider=lambda: cfg.authenticate
         ) as connection:
             with connection.cursor() as cursor:
@@ -125,7 +125,7 @@ with st.expander("Add rows to data"):
         cfg = Config() 
         with sql.connect(
             server_hostname=cfg.host,
-            http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
+            http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
             credentials_provider=lambda: cfg.authenticate
         ) as connection:
             with connection.cursor() as cursor:
