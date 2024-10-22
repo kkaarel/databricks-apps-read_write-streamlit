@@ -45,7 +45,7 @@ def sqlQuery(query: str) -> pd.DataFrame:
 st.write("Host Path:", headers["DATABRICKS_HOST"])
 st.write("ID:", headers["DATABRICKS_WAREHOUSE_ID"])
 
-DATABRICKS_WAREHOUSE_ID  = headers]"DATABRICKS_WAREHOUSE_ID"]
+DATABRICKS_WAREHOUSE_ID  = headers["DATABRICKS_WAREHOUSE_ID"]
 host = headers["DATABRICKS_HOST"]
 
 def credential_provider():
