@@ -24,7 +24,7 @@ def get_user_info():
         user_name=headers.get("X-Forwarded-Preferred-Username"),
         user_email=headers.get("X-Forwarded-Email"),
         user_id=headers.get("X-Forwarded-User"),
-    )
+    ), headers
  
 user_info = get_user_info()
 
@@ -47,41 +47,48 @@ st.write(user_info)
 
 
 
+
+
+
+with st.expander("Add rows to data"):
 # Create a form to collect user information
-with st.form(key='user_form'):
-    # Dynamically create input fields based on data columns
-    inputs = {}
-    for column in data.columns:
-        # Assuming the data is composed of simple data types like text and numbers
-        inputs[column] = st.text_input(label=column)
+    with st.form(key='user_form'):
+        # Dynamically create input fields based on data columns
+        inputs = {}
+        for column in data.columns:
+            # Assuming the data is composed of simple data types like text and numbers
+            inputs[column] = st.text_input(label=column)
 
-    # Add a submission button
-    submit_button = st.form_submit_button(label='Submit')
+        # Add a submission button
+        submit_button = st.form_submit_button(label='Submit')
 
-# Handle the form submission
-if submit_button:
-    # Collect the inputs into a DataFrame
-    user_input_data = pd.DataFrame([inputs])
-    st.write('Submitted Data:')
-    st.write(user_input_data)
-        # Insert the user input data into Databricks
-    cfg = Config() # Pull environment variables for auth
-    with sql.connect(
-        server_hostname=cfg.host,
-        http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
-        credentials_provider=lambda: cfg.authenticate
-    ) as connection:
-        with connection.cursor() as cursor:
-            # Assuming data columns match table columns
-            table_name = "app_dev.default.people"
-            st.write(f"INSERT INTO {table_name} VALUES {tuple(user_input_data.iloc[0])}")
-            cursor.execute(f"INSERT INTO {table_name} VALUES {tuple(user_input_data.iloc[0])}")
+    # Handle the form submission
+    if submit_button:
+        # Collect the inputs into a DataFrame
+        user_input_data = pd.DataFrame([inputs])
+        st.write('Submitted Data:')
+        st.write(user_input_data)
+            # Insert the user input data into Databricks
+        cfg = Config() # Pull environment variables for auth
+        with sql.connect(
+            server_hostname=cfg.host,
+            http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
+            credentials_provider=lambda: cfg.authenticate
+        ) as connection:
+            with connection.cursor() as cursor:
+                
+                try:
+                    # Assuming data columns match table columns
+                    table_name = "app_dev.default.people"
 
-    # Combine user_input_data with existing data and display
-    combined_data = pd.concat([data, user_input_data], ignore_index=True)
-    st.write('Updated Data:')
-    st.write(combined_data)
+                    cursor.execute(f"INSERT INTO {table_name} VALUES {tuple(user_input_data.iloc[0])}")
 
+                    data = getData()
+                    st.write(f"Data from {table_name}")
+                    st.write(data)
+                except Exception as e:
+                    st.error(f"An error occurred while inserting data: {e}")
+                    st.stop()
 
 
 
