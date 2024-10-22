@@ -23,6 +23,8 @@ assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be se
 headers = st.context.headers
 st.write(headers)
 
+st.write(dict(os.environ))
+
 def sqlQuery(query: str) -> pd.DataFrame:
     cfg = Config() # Pull environment variables for auth
     with sql.connect(
