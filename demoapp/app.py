@@ -12,7 +12,9 @@ st.set_page_config(
     page_icon="👋"
 )
 # Ensure environment variable is set correctly
-assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
+#assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
+
+st.write(os.getenv('DATABRICKS_WAREHOUSE_ID'))
 
 def get_user_info():
     headers = st.context.headers
