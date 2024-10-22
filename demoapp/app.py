@@ -7,6 +7,19 @@ import os
 # Ensure environment variable is set correctly
 assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
 
+def get_user_info():
+    headers = st.context.headers
+    return dict(
+        user_name=headers.get("X-Forwarded-Preferred-Username"),
+        user_email=headers.get("X-Forwarded-Email"),
+        user_id=headers.get("X-Forwarded-User"),
+    )
+ 
+user_info = get_user_info()
+
+st.write(user_info)
+
+
 def sqlQuery(query: str) -> pd.DataFrame:
     cfg = Config() # Pull environment variables for auth
     with sql.connect(
@@ -18,32 +31,33 @@ def sqlQuery(query: str) -> pd.DataFrame:
             cursor.execute(query)
             return cursor.fetchall_arrow().to_pandas()
 
-def get_user_info():
-    headers = st.context.headers
-    return dict(
-        user_name=headers.get("X-Forwarded-Preferred-Username"),
-        user_email=headers.get("X-Forwarded-Email"),
-        user_id=headers.get("X-Forwarded-User"),
-    ), headers
- 
-user_info = get_user_info()
-
-
 
 st.set_page_config(layout="wide")
 
-@st.cache_data(ttl=200)  # only re-query if it's been 30 seconds
+@st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
 def getData():
-    # This example query depends on the nyctaxi data set in Unity Catalog, see https://docs.databricks.com/en/discover/databricks-datasets.html for details
+
     return sqlQuery("select * from app_dev.default.people ")
 
 data = getData()
 
-st.write(data)
+data["Select"] = False
 
-user_info = get_user_info()
+edited_df = st.data_editor(data)
 
-st.write(user_info)
+filtered_df = edited_df[edited_df['Select']]
+
+if filtered_df.empty:
+    pass
+
+
+else:
+    st.write("Rows that are selected and need an update")
+
+    st.data(filtered_df)
+
+
+
 
 
 
