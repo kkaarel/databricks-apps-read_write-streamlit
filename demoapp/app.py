@@ -5,7 +5,16 @@ import pandas as pd
 import os
 
 
-st.set_page_config(layout="wide")
+
+st.set_page_config(
+    layout="wide"
+    page_title="Write and update yoru refrence tables in Databricks",
+    page_icon="👋",
+    menu_items={
+        'Developed by': 'https://www.linkedin.com/in/korvemaa/',
+        'Gitbub': "https://github.com/kkaarel/databricks-apps-cicd-streamlit"
+    }
+)
 # Ensure environment variable is set correctly
 assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
 
@@ -19,11 +28,9 @@ def get_user_info():
  
 user_info = get_user_info()
 
-st.write(user_info)
 
-with st.expander("Header"):
-    headers = st.context.headers
-    st.write(headers)
+with st.expander("USer info"):
+    st.write(user_info)
 
 
 def sqlQuery(query: str) -> pd.DataFrame:
@@ -40,7 +47,7 @@ def sqlQuery(query: str) -> pd.DataFrame:
 
 
 
-@st.cache_data(ttl=600)  # only re-query if it's been 600 seconds
+#@st.cache_data(ttl=600)  # IF you want to query realtime and see the changes using this is not smart
 def getData():
 
     return sqlQuery("select * from app_dev.default.people ")
@@ -48,6 +55,10 @@ def getData():
 data = getData()
 
 data["Select"] = False
+
+
+st.write("This Streamlit app integrates with Databricks to allow users to view, update, and insert rows in a reference table within a Databricks.")
+
 
 edited_df = st.data_editor(data,disabled=["id"])
 
@@ -62,7 +73,7 @@ else:
 
     st.dataframe(filtered_df)
     update_button = st.button('Update Rows')
-    
+
     if update_button:
         st.write("Updating rows...")
         cfg = Config()
@@ -91,25 +102,24 @@ else:
 
 
 with st.expander("Add rows to data"):
-# Create a form to collect user information
     with st.form(key='user_form'):
-        # Dynamically create input fields based on data columns
+
         inputs = {}
         for column in data.columns:
-            # Assuming the data is composed of simple data types like text and numbers
+    
             inputs[column] = st.text_input(label=column)
 
-        # Add a submission button
+
         submit_button = st.form_submit_button(label='Submit')
 
-    # Handle the form submission
+
     if submit_button:
-        # Collect the inputs into a DataFrame
+
         user_input_data = pd.DataFrame([inputs])
         st.write('Submitted Data:')
         st.write(user_input_data)
-            # Insert the user input data into Databricks
-        cfg = Config() # Pull environment variables for auth
+            
+        cfg = Config() 
         with sql.connect(
             server_hostname=cfg.host,
             http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
@@ -118,7 +128,7 @@ with st.expander("Add rows to data"):
             with connection.cursor() as cursor:
                 
                 try:
-                    # Assuming data columns match table columns
+           
                     table_name = "app_dev.default.people"
 
                     cursor.execute(f"INSERT INTO {table_name} VALUES {tuple(user_input_data.iloc[0])}")
