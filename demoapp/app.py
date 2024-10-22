@@ -8,12 +8,8 @@ import os
 
 st.set_page_config(
     layout="wide",
-    page_title="Write and update yoru refrence tables in Databricks",
-    page_icon="👋",
-    menu_items={
-        'Developed by': 'https://www.linkedin.com/in/korvemaa/',
-        'Gitbub': "https://github.com/kkaarel/databricks-apps-cicd-streamlit"
-    }
+    page_title="Write and update your reference tables in Databricks",
+    page_icon="👋"
 )
 # Ensure environment variable is set correctly
 assert os.getenv('DATABRICKS_WAREHOUSE_ID'), "DATABRICKS_WAREHOUSE_ID must be set in app.yaml."
