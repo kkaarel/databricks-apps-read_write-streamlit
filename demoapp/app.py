@@ -64,6 +64,17 @@ if submit_button:
     user_input_data = pd.DataFrame([inputs])
     st.write('Submitted Data:')
     st.write(user_input_data)
+        # Insert the user input data into Databricks
+    cfg = Config() # Pull environment variables for auth
+    with sql.connect(
+        server_hostname=cfg.host,
+        http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
+        credentials_provider=lambda: cfg.authenticate
+    ) as connection:
+        with connection.cursor() as cursor:
+            # Assuming data columns match table columns
+            table_name = "app_dev.default.people"
+            cursor.execute(f"INSERT INTO {table_name} VALUES {tuple(user_input_data.iloc[0])}")
 
     # Combine user_input_data with existing data and display
     combined_data = pd.concat([data, user_input_data], ignore_index=True)
