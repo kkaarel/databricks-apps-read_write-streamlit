@@ -29,21 +29,24 @@ def get_user_info():
 user_info = get_user_info()
 
 
-with st.expander("USer info"):
+with st.expander("User info"):
     st.write(user_info)
 
 
 def sqlQuery(query: str) -> pd.DataFrame:
-    cfg = Config() # Pull environment variables for auth
-    with sql.connect(
-        server_hostname=cfg.host,
-        http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
-        credentials_provider=lambda: cfg.authenticate
-    ) as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            return cursor.fetchall_arrow().to_pandas()
-
+    cfg = Config()  # Pull environment variables for auth
+    try:
+        with sql.connect(
+            server_hostname=cfg.host,
+            http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
+            credentials_provider=lambda: cfg.authenticate
+        ) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                return cursor.fetchall_arrow().to_pandas()
+    except Exception as e:
+        st.error(f"An error occurred while connecting to the database: {e}")
+        return pd.DataFrame()  # Return an empty DataFrame in case of error
 
 
 
