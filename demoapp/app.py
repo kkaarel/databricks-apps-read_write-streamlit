@@ -21,6 +21,10 @@ user_info = get_user_info()
 
 st.write(user_info)
 
+with st.expander("Header"):
+    headers = st.context.headers
+    st.write(headers)
+
 
 def sqlQuery(query: str) -> pd.DataFrame:
     cfg = Config() # Pull environment variables for auth
@@ -45,7 +49,7 @@ data = getData()
 
 data["Select"] = False
 
-edited_df = st.data_editor(data)
+edited_df = st.data_editor(data,disabled=["id"])
 
 filtered_df = edited_df[edited_df['Select']]
 
@@ -54,15 +58,34 @@ if filtered_df.empty:
 
 
 else:
-    st.write("Rows that are selected and need an update")
+    st.write("Validate selected rows and update")
 
     st.dataframe(filtered_df)
 
+    if update_button:
+        st.write("Updating rows...")
+        cfg = Config()
+        with sql.connect(
+            server_hostname=cfg.host,
+            http_path=f"/sql/1.0/warehouses/{os.getenv('DATABRICKS_WAREHOUSE_ID')}",
+            credentials_provider=lambda: cfg.authenticate
+        ) as connection:
+            with connection.cursor() as cursor:
+                for index, row in filtered_df.iterrows():
+                    try:
+                        # Assuming 'id' is the primary key and should not be updated
+                        columns = [col for col in row.index if col != "id" and col != "Select"]
+                        updates = ", ".join([f"{col} = '{row[col]}'" for col in columns])
+                        update_query = f"UPDATE app_dev.default.people SET {updates} WHERE id = {row['id']}"
+                        cursor.execute(update_query)
+                    except Exception as e:
+                        st.error(f"An error occurred while updating row {index}: {e}")
+                        st.stop()
 
-
-
-
-
+        data = getData()
+        st.write("Updated Data:")
+        st.write(data)
+        
 
 
 
