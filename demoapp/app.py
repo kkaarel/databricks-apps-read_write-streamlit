@@ -1,6 +1,6 @@
 import os
 from databricks import sql
-from databricks.sdk.core import Config
+from databricks.sdk.core import Config, oauth_service_principal
 import streamlit as st
 import pandas as pd
 import requests
