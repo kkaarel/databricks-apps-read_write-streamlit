@@ -16,6 +16,7 @@ st.set_page_config(
 
 #DATABRICKS_WAREHOUSE_ID = ""  #st.write(os.getenv('DATABRICKS_WAREHOUSE_ID'))
 
+st.write(os.environ)
 
 DATABRICKS_WAREHOUSE_ID = st.text_input(
     "Enter Databricks Warehouse ID:",
@@ -27,7 +28,7 @@ if not DATABRICKS_WAREHOUSE_ID:
     st.error("DATABRICKS_WAREHOUSE_ID must be provided.")
     st.stop()
 
-st.write(os.environ)
+
 
 def get_user_info():
     headers = st.context.headers
