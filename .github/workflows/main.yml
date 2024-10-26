@@ -41,14 +41,18 @@ jobs:
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
+        
+    - name: Setup python
+      uses: actions/setup-python@v2
+
+
     - name: Upload
       env:
         DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
         DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
-        STAGING_DIRECTORY: 'apps/'
       run: |
         echo "Checking out the releases branch"
-        databricks workspace import-dir "apps/" "$(STAGING_DIRECTORY)" --overwrite
+        databricks workspace import-dir "apps/" "apps" --overwrite
 
 
 
