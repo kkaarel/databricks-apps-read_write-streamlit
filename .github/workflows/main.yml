@@ -27,7 +27,7 @@ jobs:
           --url "$TOKEN_ENDPOINT_URL" \
           --user "$CLIENT_ID:$CLIENT_SECRET" \
           --data 'grant_type=client_credentials&scope=all-apis' | jq -r .access_token)
-        databricks configure --token <<< "$DATABRICKS_HOST\n$DATABRICKS_TOKEN"
+        
         echo "DATABRICKS_TOKEN=$DATABRICKS_TOKEN" >> $GITHUB_ENV
 
     - name: Create Databricks Directory for apps
