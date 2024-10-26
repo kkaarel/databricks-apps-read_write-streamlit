@@ -50,12 +50,14 @@ jobs:
         DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
       run: |
         echo "Checking out the releases branch"
+        databricks -v 
+        databricks sync ./apps/ /Users/kaarel@debugger.fi.com/
         
         for file in $(find apps -type f); do
           base64_content=$(base64 "$file")
           echo "filename $file"
           file_path="$(basename "$file")"
-          databricks sync ./apps/ /Repos/kaarel@debugger.fi.com/
+
 
 
   
