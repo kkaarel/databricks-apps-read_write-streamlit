@@ -49,11 +49,11 @@ jobs:
         DATABRICKS_TOKEN: $DATABRICKS_TOKEN   
 
       run: |
-
-
-        echo "[DEFAULT]" > .databrickscfg 
-        echo "host = ${{ secrets.DATABRICKS_HOST }}" >> .databrickscfg 
-        echo "token = $DATABRICKS_TOKEN " >> .databrickscfg 
+      
+        databricks configure --token <<EOF
+        ${{ secrets.DATABRICKS_HOST }}
+        $DATABRICKS_TOKEN
+        EOF
 
         echo "Uploading app files to the workspace"
         databricks workspace list /Users
