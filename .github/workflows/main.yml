@@ -41,7 +41,7 @@ jobs:
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-    - name: Check if Databricks app exists
+    - name: Check and Create Databricks app if not exists
       run: |
         RESPONSE=$(curl --request GET \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps/cicdappdemo" \
@@ -50,9 +50,7 @@ jobs:
         
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
-  
-    - name: Create Databricks app if not exists
-      run: |
+        
         if echo "$RESPONSE" | grep -q '"error_code":"RESOURCE_DOES_NOT_EXIST"'; then
           RESPONSE=$(curl --request POST \
             --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps" \
