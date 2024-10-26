@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install Databricks CLI
-      run: pip install databricks-cli
+      run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
 
     - name: Get Databricks Access Token using Service Principal
       run: |
