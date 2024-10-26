@@ -1,1 +1,33 @@
+on:
+  push:
+    paths:
+      - '**/*'
+  pull_request:
+    paths:
+      - '**/*'
 
+
+env:
+  databricks_workspace: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Databricks CLI
+      run: pip install databricks-cli
+
+    - name: Install Databricks CLI
+      run: pip install databricks-cli
+
+    - name: Get Databricks Access Token using Service Principal
+      run: |
+        DATABRICKS_TOKEN=$(databricks auth --host ${{ secrets.DATABRICKS_HOST }} --client-id ${{ secrets.DATABRICKS_CLIENT_ID_CICD }} --client-secret ${{ secrets.DATABRICKS_CLIENT_SECRET_CICD }} --resource-id 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d)
+        echo "DATABRICKS_TOKEN=$DATABRICKS_TOKEN" >> $GITHUB_ENV
+
+
+    
