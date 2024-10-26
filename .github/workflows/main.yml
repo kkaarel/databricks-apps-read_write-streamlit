@@ -55,7 +55,7 @@ jobs:
           base64_content=$(base64 "$file")
           echo "filename $file"
           file_path="$(basename "$file")"
-          databricks repos update --path /Repos/kaarel@debugger.fi/apps --branch dbw
+          databricks repos update --path /Repos/3614115830988143/apps --branch dbw
   
         done
 
