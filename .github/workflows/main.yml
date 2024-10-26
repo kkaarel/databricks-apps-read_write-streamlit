@@ -35,12 +35,13 @@ jobs:
 
     - name: List Databricks Repositories
       run: |
-        REPOS=$(curl --request GET \
-          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/mkdirs/apps" \
-          --header "Authorization: Bearer $DATABRICKS_TOKEN")
-        
-        echo "REPOS=$REPOS" >> $GITHUB_ENV
-        echo "$REPOS"
+        RESPONSE=$(curl --request POST \
+          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/mkdirs" \
+          --header "Authorization: Bearer $DATABRICKS_TOKEN") \
+          --header "Content-Type: application/json" \
+          --data '{"path": "/apps"}')
+        echo "RESPONSE=$RESPONSE" >> $GITHUB_ENV
+        echo "$RESPONSE"
 
 
     
