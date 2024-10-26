@@ -41,10 +41,8 @@ jobs:
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-
     - name: Setup python
       uses: actions/setup-python@v2
-
 
     - name: Upload
       env:
@@ -53,12 +51,8 @@ jobs:
       run: |
         echo "Checking out the releases branch"
   
-        databricks workspace import_dir "apps" "/apps" -f SOURCE --overwrite 
-
-
-
-  
-
+        databricks workspace import_dir "apps" "/apps" --overwrite 
+    
     - name: Check and Create Databricks app if not exists
       run: |
         RESPONSE=$(curl --request GET \
