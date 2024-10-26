@@ -71,9 +71,6 @@ jobs:
 
         done
 
-
-
-  
     
     - name: Check and Create Databricks app if not exists
       env:
@@ -85,15 +82,7 @@ jobs:
           app_name=$(basename "$app_dir")
           echo "Processing app: $app_name"
 
-          # Create a JSON configuration file for the app
-          cat <<EOF > app_config.json
-          {
-            "name": "$app_name",
-            "source_code_path": "/app/$app_name"
-          }
-          EOF
-
           # Use the JSON configuration file to create the app
-          databricks apps create $app_name --json @app_config.json
+          databricks apps create $app_name --source-code-path /Workspace/apps/$app_name
 
         done
