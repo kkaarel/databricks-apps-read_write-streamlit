@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install Databricks CLI
-      run: pip install databricks-cli==0.18
+      run: pip install databricks-cli
 
     - name: Get Databricks Access Token using Service Principal
       run: |
