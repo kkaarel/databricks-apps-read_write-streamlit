@@ -53,7 +53,7 @@ jobs:
       run: |
         echo "Checking out the releases branch"
   
-        databricks workspace import_dir "apps" "/apps" --overwrite --format SOURCE
+        databricks workspace import_dir "apps" "/apps" -f SOURCE --overwrite 
 
 
 
