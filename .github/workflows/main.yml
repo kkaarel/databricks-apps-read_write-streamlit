@@ -51,10 +51,14 @@ jobs:
           # Read the file content
           FILE_CONTENT=$(base64 "$file")
 
+          # Construct JSON data using jq
+          JSON_DATA=$(jq -n --arg path "/$file" --arg format "SOURCE" --arg content "$FILE_CONTENT" \
+            '{path: $path, format: $format, content: $content}')
+
           RESPONSE=$(curl --request POST \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --data "{\"path\": \"/$file\", \"format\": \"SOURCE\", \"content\": \"$FILE_CONTENT\"}")
+          --data "$JSON_DATA")
         
           echo "response=$RESPONSE" >> $GITHUB_ENV
           echo "$RESPONSE"
