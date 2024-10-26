@@ -52,11 +52,14 @@ jobs:
         echo "Checking out the releases branch"
         databricks -v 
         databricks sync ./apps/ /apps
-        
+
+
         for file in $(find apps -type f); do
           base64_content=$(base64 "$file")
           echo "filename $file"
           file_path="$(basename "$file")"
+          app_name=$(echo "$file" | cut -d'/' -f2)
+          echo "app_name $app_name"
 
 
 
