@@ -24,7 +24,7 @@ jobs:
       run: |
         export CLIENT_ID=${{ secrets.DATABRICKS_CLIENT_ID_CICD }}
         export CLIENT_SECRET=${{ secrets.DATABRICKS_CLIENT_SECRET_CICD }}
-        export TOKEN_ENDPOINT_URL="https://${{ secrets.DATABRICKS_HOST }}/oidc/v1/token"
+        export TOKEN_ENDPOINT_URL="${{ secrets.DATABRICKS_HOST }}/oidc/v1/token"
         
         DATABRICKS_TOKEN=$(curl --request POST \
           --url "$TOKEN_ENDPOINT_URL" \
