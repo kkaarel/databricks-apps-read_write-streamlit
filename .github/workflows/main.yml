@@ -41,26 +41,41 @@ jobs:
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-    - name: Import directory to Databricks app directory
-      run: |
-        for file in $(find apps/ -type f); do
-          echo "Importing $file to Databricks"
-          RESPONSE=$(curl --request POST \
-            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
-            --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-            --header "Content-Type: application/json" \
-            --data @<(cat <<EOF
+        - name: Import directory to Databricks app directory
+        run: |
+          for file in $(find apps/ -type f); do
+            echo "Importing $file to Databricks"
+            
+            # Create a temporary file for the JSON payload
+            JSON_PAYLOAD=$(mktemp)
+            cat <<EOF > $JSON_PAYLOAD
             {
               "path": "/apps/$(basename $file)",
               "format": "SOURCE",
-              "language": "PYTHON",
               "content": "$(base64 $file)"
             }
             EOF
-            ))
-          echo "response=$RESPONSE" >> $GITHUB_ENV
-          echo "$RESPONSE"
-        done
+  
+            # Perform the import
+            RESPONSE=$(curl --request POST \
+              --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
+              --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+              --header "Content-Type: application/json" \
+              --data @$JSON_PAYLOAD)
+  
+            # Log the response
+            echo "response=$RESPONSE" >> $GITHUB_ENV
+            echo "$RESPONSE"
+  
+            # Check for errors in the response
+            if echo "$RESPONSE" | grep -q '"error_code"'; then
+              echo "Error importing $file: $RESPONSE"
+              exit 1
+            fi
+  
+            # Clean up the temporary file
+            rm $JSON_PAYLOAD
+          done
 
   
 
