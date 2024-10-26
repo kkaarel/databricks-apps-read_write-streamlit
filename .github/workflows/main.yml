@@ -94,9 +94,9 @@ jobs:
           --data "{\"name\": \"$app_name\", \"default_source_code_path\": \"/apps/$app_name\"}")
         
           echo "response=$RESPONSE" >> $GITHUB_ENV
-          echo "$RESPONSE"
+          echo "Create app $RESPONSE"
 
-  
+          databricks apps deploy $app_name --source-code-path /Workspace/apps/$app_name
 
 
         done
