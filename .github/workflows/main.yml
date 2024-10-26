@@ -49,8 +49,7 @@ jobs:
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json" \
           --data '{
-            "path": "/apps",
-            "overwrite": true
+            "path": "/apps"
           }')
 
         echo "response=$RESPONSE" >> $GITHUB_ENV
