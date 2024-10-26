@@ -41,17 +41,21 @@ jobs:
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-    - name: Set up Databricks CLI environment variables
-      run: |
-        echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
-        echo "DATABRICKS_TOKEN=$DATABRICKS_TOKEN" >> $GITHUB_ENV
 
     - name: Import directory to Databricks app directory
-      env:
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-        DATABRICKS_TOKEN: $DATABRICKS_TOKEN
       run: |
-        databricks workspace import_dir "apps/" "apps/" --overwrite
+        RESPONSE=$(curl --request POST \
+          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
+          --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+          --header "Content-Type: application/json" \
+          --data '{
+            "path": "/apps",
+            "overwrite": true
+          }')
+
+        echo "response=$RESPONSE" >> $GITHUB_ENV
+        echo "$RESPONSE"
+        
 
   
 
