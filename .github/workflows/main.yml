@@ -38,18 +38,17 @@ jobs:
           --header "Content-Type: application/json" \
           --data '{"path": "/apps"}')
         
-        echo "RESPONSE=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-    - name: List Databricks Directories
+    - name: Create Databricks app
       run: |
-        RESPONSE=$(curl --request GET \
-          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/list" \
+        RESPONSE=$(curl --request POST \
+          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --header "Content-Type: application/json" \ 
-          --data '{"path": "/"}, "object_type": "DIRECTORY"')
-          
-        echo "RESPONSE=$RESPONSE" >> $GITHUB_ENV
+          --header "Content-Type: application/json" \
+          --data '{"name": "cicdappdemo"}')
+        
         echo "$RESPONSE"
+
 
     
