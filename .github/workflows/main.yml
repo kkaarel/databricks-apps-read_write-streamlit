@@ -41,46 +41,18 @@ jobs:
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-    - name: Import directory to Databricks app directory
-      env:
-        CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID_CICD }}
-        CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET_CICD }}
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-        DATABRICKS_TOKEN: $DATABRICKS_TOKEN   
+    - name: Setup python
+      uses: actions/setup-python@v2
+    - name: Build wheel
+      run:
+        python setup.py bdist_wheel
 
-      run: |
-      
-
-
-        echo "Uploading app files to the workspace"
-        databricks workspace list /Users
-       # databricks workspace import-dir "apps/" "apps" --overwrite
-
-
-    - name: Import directory to Databricks app directory
-      run: |
-        echo "Listing files in apps/ directory:"
-        find apps/ -type f
-        for file in $(find apps/ -type f); do
-          echo "Importing $file to Databricks"
-          
-          # Read the file content and base64 encode it
-          FILE_CONTENT=$(base64 -w 0 "$file")
-
-          # Construct JSON data using jq
-          JSON_DATA=$(jq -n --arg path "/$file" --arg format "SOURCE" --arg content "$FILE_CONTENT" \
-            '{path: $path, format: $format, content: $content}')
-
-          RESPONSE=$(curl --request POST \
-          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
-          --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --header "Content-Type: application/json" \
-          --data "$JSON_DATA")
-        
-          echo "response=$RESPONSE" >> $GITHUB_ENV
-          echo "$RESPONSE"
-          
-        done
+    - name: upload-dbfs-temp
+      uses: databricks/upload-dbfs-temp@v0
+      with:
+        local-path: ./apps/
+        databricks-host: ${{ secrets.DATABRICKS_HOST }}
+        databricks-token: $DATABRICKS_TOKEN  
 
   
 
