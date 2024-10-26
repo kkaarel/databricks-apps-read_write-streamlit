@@ -37,22 +37,14 @@ jobs:
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json" \
           --data '{"path": "/apps"}')
-        
+          
+        databricks configure --token <<< "$DATABRICKS_HOST\n$DATABRICKS_TOKEN"
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-    - name: Import files to Databricks app directory
+    - name: Import directory to Databricks app directory
       run: |
-        for file in $(find . -type f); do
-          RESPONSE=$(curl --request POST \
-            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
-            --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-            --header "Content-Type: application/json" \
-            --data "{\"path\": \"/apps/$(basename $file)\", \"format\": \"DBC\", \"overwrite\": false, \"content\": \"$(base64 -w 0 $file)\"}")
-          
-          echo "response=$RESPONSE" >> $GITHUB_ENV
-          echo "$RESPONSE"
-        done
+        databricks workspace import-dir "apps" "/apps/" --overwrite
 
   
 
