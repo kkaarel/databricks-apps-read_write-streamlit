@@ -26,7 +26,7 @@ jobs:
 
     - name: Get Databricks Access Token using Service Principal
       run: |
-        DATABRICKS_TOKEN=$(databricks auth --host ${{ secrets.DATABRICKS_HOST }} --client-id ${{ secrets.DATABRICKS_CLIENT_ID_CICD }} --client-secret ${{ secrets.DATABRICKS_CLIENT_SECRET_CICD }} --resource-id 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d)
+        DATABRICKS_TOKEN=$(databricks auth --host ${{ secrets.DATABRICKS_HOST }} --client-id ${{ secrets.DATABRICKS_CLIENT_ID_CICD }} --client-secret ${{ secrets.DATABRICKS_CLIENT_SECRET_CICD }})
         echo "DATABRICKS_TOKEN=$DATABRICKS_TOKEN" >> $GITHUB_ENV
 
 
