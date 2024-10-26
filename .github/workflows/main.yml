@@ -41,12 +41,13 @@ jobs:
         echo "RESPONSE=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-    - name: Create Databricks Directories
+    - name: List Databricks Directories
       run: |
         RESPONSE=$(curl --request GET \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/list" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --header "Content-Type: application/json")
+          --header "Content-Type: application/json" \ 
+          --data '{"path": "/"}')
           
         echo "RESPONSE=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
