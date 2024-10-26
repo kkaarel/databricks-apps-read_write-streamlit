@@ -43,7 +43,7 @@ jobs:
 
     - name: Create Databricks Directories
       run: |
-        RESPONSE=$(curl --request POST \
+        RESPONSE=$(curl --request GET \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/list" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json")
