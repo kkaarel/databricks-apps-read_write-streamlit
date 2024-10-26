@@ -54,7 +54,7 @@ jobs:
         echo "token = $DATABRICKS_TOKEN " >> .databrickscfg 
 
         echo "Uploading app files to the workspace"
-        databricks current-user me
+        databricks workspace list /Users
         databricks workspace import-dir "apps/" "apps" --overwrite
 
 
