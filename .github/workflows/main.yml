@@ -51,7 +51,7 @@ jobs:
       run: |
         echo "Checking out the releases branch"
         databricks -v 
-        databricks sync ./apps/ /apps
+        databricks sync ./apps/ /apps -o
 
 
         for file in $(find apps -type f); do
@@ -59,6 +59,7 @@ jobs:
           echo "filename $file"
           file_path="$(basename "$file")"
           app_name=$(echo "$file" | cut -d'/' -f2)
+          echo "file_path"
           echo "app_name $app_name"
 
 
