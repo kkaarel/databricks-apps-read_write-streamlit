@@ -43,9 +43,12 @@ jobs:
 
     - name: Import directory to Databricks app directory
       run: |
+        echo "Listing files in apps/ directory:"
+        find apps/ -type f
         for file in $(find apps/ -type f); do
           echo "Importing $file to Databricks"
-          
+          # Add your import logic here
+        done
 
   
 
