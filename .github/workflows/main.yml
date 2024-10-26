@@ -47,7 +47,7 @@ jobs:
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/list" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json" \ 
-          --data '{"path": "/"}')
+          --data '{"path": ""}')
           
         echo "RESPONSE=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
