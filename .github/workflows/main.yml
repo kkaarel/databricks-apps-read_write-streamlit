@@ -47,9 +47,9 @@ jobs:
         find apps/ -type f
         for file in $(find apps/ -type f); do
           echo "Importing $file to Databricks"
-
-          # Read the file content
-          FILE_CONTENT=$(base64 "$file")
+          
+          # Read the file content and base64 encode it
+          FILE_CONTENT=$(base64 -w 0 "$file")
 
           # Construct JSON data using jq
           JSON_DATA=$(jq -n --arg path "/$file" --arg format "SOURCE" --arg content "$FILE_CONTENT" \
@@ -58,6 +58,7 @@ jobs:
           RESPONSE=$(curl --request POST \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+          --header "Content-Type: application/json" \
           --data "$JSON_DATA")
         
           echo "response=$RESPONSE" >> $GITHUB_ENV
