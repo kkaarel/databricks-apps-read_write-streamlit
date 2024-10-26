@@ -55,7 +55,8 @@ jobs:
           base64_content=$(base64 "$file")
           echo "filename $file"
           file_path="$(basename "$file")"
-          databricks workspace import --format AUTO --file $file
+          databricks repos update --path /apps --branch dbw
+  
         done
 
   
