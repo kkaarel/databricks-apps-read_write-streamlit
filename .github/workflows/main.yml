@@ -54,7 +54,7 @@ jobs:
         for file in $(find apps -type f); do
           base64_content=$(base64 "$file")
           echo "filename $file"
-          file_path="/apps/$(basename "$file")"
+          file_path="$(basename "$file")"
           curl --request POST \
             --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
             --header "Authorization: Bearer $DATABRICKS_TOKEN" \
