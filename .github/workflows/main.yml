@@ -41,6 +41,21 @@ jobs:
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
+    - name: Import folders to Databricks app directory
+      run: |
+        for folder in $(ls -d */); do
+          RESPONSE=$(curl --request POST \
+            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
+            --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data "{\"path\": \"/apps/$folder\", \"format\": \"DBC\", \"overwrite\": false, \"content\": \"$(base64 -w 0 $folder)\"}")
+          
+          echo "response=$RESPONSE" >> $GITHUB_ENV
+          echo "$RESPONSE"
+        done
+
+  
+
     - name: Check and Create Databricks app if not exists
       run: |
         RESPONSE=$(curl --request GET \
@@ -64,14 +79,5 @@ jobs:
           echo "App already exists. Skipping creation."
         fi
 
-    - name: List groups
-      run: |
-        RESPONSE=$(curl --request GET \
-          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/groups/list-members" \
-          --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --header "Content-Type: application/json")
-        
-        echo "response=$RESPONSE" >> $GITHUB_ENV
-        echo "$RESPONSE"
 
     
