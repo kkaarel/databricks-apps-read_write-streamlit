@@ -44,23 +44,7 @@ jobs:
 
     - name: Import directory to Databricks app directory
       run: |
-        encode_and_upload() {
-          local dir_path=$1
-          for file in $(find "$dir_path" -type f); do
-            local relative_path=${file#$dir_path/}
-            local base64_content=$(base64 "$file")
-            local data=$(jq -n --arg path "/apps/$relative_path" --arg content "$base64_content" '{path: $path, content: $content, format: "SOURCE"}')
-            
-            RESPONSE=$(curl --request POST \
-              --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
-              --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-              --header "Content-Type: application/json" \
-              --data "$data")
-            
-            echo "response=$RESPONSE" >> $GITHUB_ENV
-            echo "$RESPONSE"
-          done
-        }
+          ls apps/
         
 
   
