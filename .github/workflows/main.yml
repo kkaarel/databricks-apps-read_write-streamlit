@@ -69,7 +69,7 @@ jobs:
     - name: List groups
       run: |
         RESPONSE=$(curl --request GET \
-          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/groups/list" \
+          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/groups/list-members" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json")
         
