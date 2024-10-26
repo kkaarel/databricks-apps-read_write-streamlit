@@ -40,17 +40,30 @@ jobs:
         
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
-
-    - name: Create Databricks app
+        
+    - name: Check if Databricks app exists
       run: |
-        RESPONSE=$(curl --request POST \
-          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps" \
+        RESPONSE=$(curl --request GET \
+          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps/cicdappdemo" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --header "Content-Type: application/json" \
-          --data '{"name": "cicdappdemo"}')
+          --header "Content-Type: application/json")
         
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
-
+  
+    - name: Create Databricks app if not exists
+      run: |
+        if echo "$RESPONSE" | grep -q '"error_code":"RESOURCE_DOES_NOT_EXIST"'; then
+          RESPONSE=$(curl --request POST \
+            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps" \
+            --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data '{"name": "cicdappdemo"}')
+          
+          echo "response=$RESPONSE" >> $GITHUB_ENV
+          echo "$RESPONSE"
+        else
+          echo "App already exists. Skipping creation."
+        fi
 
     
