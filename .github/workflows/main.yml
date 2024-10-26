@@ -48,10 +48,13 @@ jobs:
         for file in $(find apps/ -type f); do
           echo "Importing $file to Databricks"
 
+          # Read the file content
+          FILE_CONTENT=$(base64 "$file")
+
           RESPONSE=$(curl --request POST \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --data "{\"path\": \"/$file\", \"format\": \"SOURCE\"}")
+          --data "{\"path\": \"/$file\", \"format\": \"SOURCE\", \"content\": \"$FILE_CONTENT\"}")
         
           echo "response=$RESPONSE" >> $GITHUB_ENV
           echo "$RESPONSE"
