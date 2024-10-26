@@ -6,10 +6,6 @@ on:
     paths:
       - '**/*'
 
-
-env:
-  databricks_workspace: 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,7 +27,7 @@ jobs:
         export TOKEN_ENDPOINT_URL="https://${{ secrets.DATABRICKS_HOST }}/oidc/v1/token"
         
         DATABRICKS_TOKEN=$(curl --request POST \
-          --url $TOKEN_ENDPOINT_URL \
+          --url "$TOKEN_ENDPOINT_URL" \
           --user "$CLIENT_ID:$CLIENT_SECRET" \
           --data 'grant_type=client_credentials&scope=all-apis' | jq -r .access_token)
         
