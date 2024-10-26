@@ -43,9 +43,6 @@ jobs:
 
     - name: Setup python
       uses: actions/setup-python@v2
-    - name: Build wheel
-      run:
-        python setup.py bdist_wheel
 
     - name: upload-dbfs-temp
       uses: databricks/upload-dbfs-temp@v0
