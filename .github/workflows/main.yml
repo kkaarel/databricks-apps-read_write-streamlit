@@ -58,7 +58,7 @@ jobs:
             --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
             --header "Authorization: Bearer $DATABRICKS_TOKEN" \
             --header "Content-Type: application/json" \
-            --data "{\"path\": \"$file_path\", \"content\": \"$base64_content\", \"overwrite\": true}"
+            --data '{"path": "$file_path", "content": "$base64_content", "overwrite": true}'
         done
 
   
