@@ -45,10 +45,10 @@ jobs:
       env:
         DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
         DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
-        STAGING_DIRECTORY: '/Repos/apps'
+        STAGING_DIRECTORY: 'apps/'
       run: |
         echo "Checking out the releases branch"
-        databricks repos update --path "$STAGING_DIRECTORY" --branch "${{ github.ref_name }}"
+        databricks workspace import-dir "apps/" "$(STAGING_DIRECTORY)" --overwrite
 
 
 
