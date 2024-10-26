@@ -44,11 +44,11 @@ jobs:
     - name: Upload
       env:
         DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-        DATABRICKS_TOKEN: $(DATABRICKS_TOKEN)
-        STAGING_DIRECTORY: 'apps'
+        DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+        STAGING_DIRECTORY: '/Repos/apps'
       run: |
         echo "Checking out the releases branch"
-        databricks repos update --path "$(STAGING_DIRECTORY)" --branch "$(Build.SourceBranchName)"
+        databricks repos update --path "$STAGING_DIRECTORY" --branch "${{ github.ref_name }}"
 
 
 
