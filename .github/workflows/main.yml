@@ -52,7 +52,7 @@ jobs:
         DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
       run: |
         echo "Checking out the releases branch"
-        databricks workspace import-dir "apps/" "apps" --overwrite
+        databricks workspace import-dir "apps" "/apps" --overwrite
 
 
 
