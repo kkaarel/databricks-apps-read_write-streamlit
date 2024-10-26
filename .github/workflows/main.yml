@@ -49,6 +49,7 @@ jobs:
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json" \
           --data '{
+            "format": "SOURCE",
             "path": "/apps"
           }')
 
