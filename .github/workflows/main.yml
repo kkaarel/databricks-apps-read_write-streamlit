@@ -51,7 +51,7 @@ jobs:
           RESPONSE=$(curl --request POST \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --data "{\"path\": \"$file\", \"format\": \"AUTO\"}")
+          --data "{\"path\": \"$file\", \"format\": \"SOURCE\"}")
         
           echo "response=$RESPONSE" >> $GITHUB_ENV
           echo "$RESPONSE"
