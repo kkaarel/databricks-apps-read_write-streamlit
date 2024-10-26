@@ -38,6 +38,7 @@ jobs:
           --header "Content-Type: application/json" \
           --data '{"path": "/apps"}')
         
+        echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
     - name: Create Databricks app
@@ -48,6 +49,7 @@ jobs:
           --header "Content-Type: application/json" \
           --data '{"name": "cicdappdemo"}')
         
+        echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
 
