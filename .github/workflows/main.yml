@@ -48,7 +48,7 @@ jobs:
         STAGING_DIRECTORY: 'apps'
       run: |
         echo "Checking out the releases branch"
-        databricks repos update --path $(STAGING_DIRECTORY) --branch "$(Build.SourceBranchName)"
+        databricks repos update --path "$(STAGING_DIRECTORY)" --branch "$(Build.SourceBranchName)"
 
 
 
