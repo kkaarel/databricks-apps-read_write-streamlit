@@ -48,7 +48,7 @@ jobs:
         for file in $(find apps/ -type f); do
           echo "Importing $file to Databricks"
 
-          RESPONSE=$(curl --request GET \
+          RESPONSE=$(curl --request POST \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --data "{\"path\": \"$file\", \"format\": \"AUTO\"}")
