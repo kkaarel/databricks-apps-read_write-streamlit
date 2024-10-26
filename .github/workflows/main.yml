@@ -36,7 +36,7 @@ jobs:
     - name: List Databricks Repositories
       run: |
         REPOS=$(curl --request GET \
-          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/list" \
+          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/list?path=/Users/" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN")
         
         echo "REPOS=$REPOS" >> $GITHUB_ENV
