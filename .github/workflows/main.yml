@@ -7,15 +7,12 @@ on:
       - '**/*'
 
 jobs:
-  build:
+  Build-Databricks-Apps:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
-    - name: Install Databricks CLI
-      run: pip install databricks-cli
 
     - name: Install Databricks CLI
       run: pip install databricks-cli
@@ -33,7 +30,7 @@ jobs:
         
         echo "DATABRICKS_TOKEN=$DATABRICKS_TOKEN" >> $GITHUB_ENV
 
-    - name: Create Databricks Directory
+    - name: Create Databricks Directory for apps
       run: |
         RESPONSE=$(curl --request POST \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/mkdirs" \
