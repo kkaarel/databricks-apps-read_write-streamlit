@@ -40,7 +40,7 @@ jobs:
         
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
-        
+
     - name: Check if Databricks app exists
       run: |
         RESPONSE=$(curl --request GET \
@@ -65,5 +65,15 @@ jobs:
         else
           echo "App already exists. Skipping creation."
         fi
+
+    - name: List groups
+      run: |
+        RESPONSE=$(curl --request GET \
+          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/groups/list" \
+          --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+          --header "Content-Type: application/json")
+        
+        echo "response=$RESPONSE" >> $GITHUB_ENV
+        echo "$RESPONSE"
 
     
