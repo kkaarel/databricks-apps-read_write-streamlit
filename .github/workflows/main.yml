@@ -62,35 +62,29 @@ jobs:
           echo "file_path"
           echo "app_name $app_name"
 
-
-
-  
         done
+
+                # Get a distinct list of apps
+        for app_dir in $(find apps -mindepth 1 -maxdepth 1 -type d); do
+          app_name=$(basename "$app_dir")
+          echo "Processing app: $app_name"
+
+        done
+
+
 
   
     
     - name: Check and Create Databricks app if not exists
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
       run: |
-        RESPONSE=$(curl --request GET \
-          --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps/cicdappdemo" \
-          --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-          --header "Content-Type: application/json")
-        
-        echo "response=$RESPONSE" >> $GITHUB_ENV
-        echo "$RESPONSE"
-        
-        if echo "$RESPONSE" | grep -q '"error_code":"RESOURCE_DOES_NOT_EXIST"'; then
-          RESPONSE=$(curl --request POST \
-            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps" \
-            --header "Authorization: Bearer $DATABRICKS_TOKEN" \
-            --header "Content-Type: application/json" \
-            --data '{"name": "cicdappdemo"}')
-          
-          echo "response=$RESPONSE" >> $GITHUB_ENV
-          echo "$RESPONSE"
-        else
-          echo "App already exists. Skipping creation."
-        fi
+        for app_dir in $(find apps -mindepth 1 -maxdepth 1 -type d); do
+          app_name=$(basename "$app_dir")
+          echo "Processing app: $app_name"
+
+          databricks apps create $app_name --target /app/$app_name
 
 
     
