@@ -44,12 +44,13 @@ jobs:
     - name: Setup python
       uses: actions/setup-python@v2
 
-    - name: upload-dbfs-temp
-      uses: databricks/upload-dbfs-temp@v0
+    - name: databricks-import-directory
+      uses: microsoft/databricks-import-directory@v1.0.0
       with:
-        local-path: ./apps/
         databricks-host: ${{ secrets.DATABRICKS_HOST }}
-        databricks-token: $DATABRICKS_TOKEN  
+        databricks-token: $DATABRICKS_TOKEN
+        local-path: ./apps
+        remote-path: /apps
 
   
 
