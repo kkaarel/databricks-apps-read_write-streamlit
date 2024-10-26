@@ -57,7 +57,7 @@ jobs:
           file_path="$(basename "$file")"
           curl --request POST \
             --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/import" \
-            --header "Authorization: Bearer $DATABRICKS_TOKEN" 
+            --header "Authorization: Bearer $DATABRICKS_TOKEN"  \
             --data "{\"path\": \"$file_path\", \"content\": \"$base64_content\",\"format\": \"SOURCE\"}"
         done
 
