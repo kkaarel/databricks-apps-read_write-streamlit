@@ -96,93 +96,9 @@ jobs:
               sleep 30
             done
           fi
-          #This will make sure that the up will update
+          #This will make sure that the app will update
           databricks apps deploy $app_name --source-code-path /Workspace/apps/$app_name
 
         done
 
 
-    - uses: azure/login@v2
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Azure CLI script
-      uses: azure/cli@v2
-      with:
-        azcliversion: latest
-        inlineScript: |
-          DATABRICKS_TOKEN_ACCOUNT=$(az account get-access-token --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d --query accessToken -o tsv)
-
-          if [ -z "$DATABRICKS_TOKEN_ACCOUNT" ]; then
-            echo "Warning: Access token not set"
-          else
-            echo "Access token: $DATABRICKS_TOKEN_ACCOUNT"
-            echo "DATABRICKS_TOKEN_ACCOUNT=$DATABRICKS_TOKEN_ACCOUNT" >> $GITHUB_ENV
-          fi
-    
-
-      
-
-    - name: Get app Service principals and add to app group
-      env:
-        DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN_ACCOUNT }}
-        DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-
-
-      run: |
-
-
-        SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_id')
-
-        APPS_GROUP_ID=$(databricks groups list | grep 'apps' | awk '{print $1}')
-
-
-        # Add each service principal to the 'apps' group
-
-        for SP_ID in $SERVICE_PRINCIPAL_IDS; do
-
-          echo "Adding service principal $SP_ID to group 'apps'"
-          echo "DATABRICKS_TOKEN_ACCOUNT: $DATABRICKS_TOKEN_ACCOUNT"
-          echo "APPS_GROUP_ID: $APPS_GROUP_ID"
-          echo "SP_ID: $SP_ID"
-
-          RESPONSE=$(curl --request PATCH \
-            --url "https://accounts.azuredatabricks.net/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/scim/v2/Groups/$APPS_GROUP_ID" \
-            --header "Authorization: Bearer $DATABRICKS_TOKEN_ACCOUNT" \
-            --header "Content-Type: application/json" \
-            --data '{
-              "schemas": [
-                "urn:ietf:params:scim:api:messages:2.0:PatchOp"
-              ],
-              "Operations": [
-                {
-                  "op": "add",
-                  "path": "members",
-                  "value": [
-                    {
-                      "value": "'"$SP_ID"'"
-                    }
-                  ]
-                }
-              ]
-            }' 2>&1)
-
-          echo "response=$RESPONSE" >> $GITHUB_ENV
-          echo "$RESPONSE"
-
-          # Check if the response is valid JSON
-          if echo "$RESPONSE" | jq . > /dev/null 2>&1; then
-            # Check if the response contains any error messages
-            if echo "$RESPONSE" | jq -e '.Errors' > /dev/null; then
-              echo "Error adding service principal $SP_ID to group 'apps':"
-              echo "$RESPONSE" | jq '.Errors'
-            else
-              echo "Successfully added service principal $SP_ID to group 'apps'"
-            fi
-          else
-            echo "Invalid JSON response received:"
-            echo "$RESPONSE"
-          fi
-          
-        done
