@@ -111,12 +111,12 @@ jobs:
       with:
         azcliversion: latest
         inlineScript: |
-          token=$(az account get-access-token --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d --query accessToken -o tsv)
+          DATABRICKS_TOKEN_ACCOUNT=$(az account get-access-token --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d --query accessToken -o tsv)
 
-          if [ -z "$token" ]; then
+          if [ -z "$DATABRICKS_TOKEN_ACCOUNT" ]; then
             echo "Warning: Access token not set"
           else
-            echo "Access token: $token"
+            echo "Access token: $DATABRICKS_TOKEN_ACCOUNT"
           fi
     
 
@@ -126,11 +126,12 @@ jobs:
       env:
         DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN_ACCOUNT }}
         DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
-        
+        DATABRICKS_HOST: 'https://accounts.azuredatabricks.net'
+
 
       run: |
       
-
+        databricks  current-user me  
         # List all apps and extract service_principal_ids
         SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_id')
 
