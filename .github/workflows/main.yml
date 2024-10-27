@@ -141,7 +141,7 @@ jobs:
         for SP_ID in $SERVICE_PRINCIPAL_IDS; do
           echo "Adding service principal $SP_ID to group 'apps'"
           RESPONSE=$(curl --request PATCH \
-            --url "https://accounts.azuredatabricks.net/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/scim/v2/Groups/$APPS_GROUP_ID" \
+            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/scim/v2/Groups/$APPS_GROUP_ID" \
             --header "Authorization: Bearer $DATABRICKS_TOKEN_ACCOUNT" \
             --header "Content-Type: application/json" \
             --data '{
