@@ -5,7 +5,6 @@ import pandas as pd
 import os
 
 
-
 st.set_page_config(
     layout="wide",
     page_title="Write and update your reference tables in Databricks",
@@ -19,7 +18,7 @@ st.set_page_config(
 st.write(os.environ)
 
 DATABRICKS_WAREHOUSE_ID = st.text_input(
-    "Enter Databricks Warehouse ID:",
+    "Enter Databricks Warehouse ID:👋",
     value=os.getenv('DATABRICKS_WAREHOUSE_ID', ''),
     help="Please provide the Databricks Warehouse ID if it's not set as an environment variable."
 )
