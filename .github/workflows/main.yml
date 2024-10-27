@@ -117,6 +117,7 @@ jobs:
             echo "Warning: Access token not set"
           else
             echo "Access token: $DATABRICKS_TOKEN_ACCOUNT"
+            echo "DATABRICKS_TOKEN_ACCOUNT=$DATABRICKS_TOKEN_ACCOUNT" >> $GITHUB_ENV
           fi
     
 
