@@ -116,7 +116,7 @@ jobs:
             --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/groups/add-member" \
             --header "Authorization: Bearer $DATABRICKS_TOKEN" \
             --header "Content-Type: application/json" \
-            --data "{\"group_name\": \"apps\", \"member_id\": \"$SP_ID\"}")
+            --data "{\"group_name\": \"6862273038496\", \"member_id\": \"$SP_ID\"}")
 
           echo "response=$RESPONSE" >> $GITHUB_ENV
           echo "$RESPONSE"
