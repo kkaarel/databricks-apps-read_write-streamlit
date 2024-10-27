@@ -126,7 +126,7 @@ jobs:
       env:
         DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN_ACCOUNT }}
         DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
-        DATABRICKS_HOST: 'https://accounts.azuredatabricks.net'
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
 
 
       run: |
