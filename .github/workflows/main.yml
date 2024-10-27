@@ -101,9 +101,25 @@ jobs:
 
         done
 
+    - name: Get Databricks ACCount Access Token using Service Principal
+      run: |
+        export CLIENT_ID=${{ secrets.DATABRICKS_CLIENT_ID_CICD }}
+        export CLIENT_SECRET=${{ secrets.DATABRICKS_CLIENT_SECRET_CICD }}
+        export TOKEN_ENDPOINT_URL="https://accounts.azuredatabricks.net/oidc/v1/token"
+        
+        DATABRICKS_TOKEN_ACCOUNT=$(curl --request POST \
+          --url "$TOKEN_ENDPOINT_URL" \
+          --user "$CLIENT_ID:$CLIENT_SECRET" \
+          --data 'grant_type=client_credentials&scope=all-apis' | jq -r .access_token)
+        
+        echo "DATABRICKS_TOKEN_ACCOUNT=$DATABRICKS_TOKEN_ACCOUNT" >> $GITHUB_ENV
+
+
+      
+
     - name: Get app Service principals and add to app group
       env:
-        DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+        DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN_ACCOUNT }}
         DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
       run: |
       
