@@ -133,7 +133,7 @@ jobs:
       run: |
 
 
-        SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_name')
+        SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_id')
 
         APPS_GROUP_ID=$(databricks groups list | grep 'apps' | awk '{print $1}')
 
