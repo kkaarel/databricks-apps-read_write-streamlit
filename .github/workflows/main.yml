@@ -86,7 +86,6 @@ jobs:
           fi
           echo "Processing app: $app_name"
 
-
           RESPONSE=$(curl --request POST \
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
@@ -96,7 +95,21 @@ jobs:
           echo "response=$RESPONSE" >> $GITHUB_ENV
           echo "Create app $RESPONSE"
 
-          databricks apps deploy $app_name --source-code-path /Workspace/apps/$app_name
+          # Wait until the app is in the ACTIVE state
+          while true; do
+            APP_STATUS=$(curl --request GET \
+              --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps/$app_name" \
+              --header "Authorization: Bearer $DATABRICKS_TOKEN" | jq -r .compute_status.state)
+            
+            if [[ "$APP_STATUS" == "ACTIVE" ]]; then
+              echo "App $app_name is ACTIVE"
+              break
+            fi
+            
+            echo "Waiting for app $app_name to become ACTIVE. Current state: $APP_STATUS"
+            sleep 30
+          done
 
+          databricks apps deploy $app_name --source-code-path /Workspace/apps/$app_name
 
         done
