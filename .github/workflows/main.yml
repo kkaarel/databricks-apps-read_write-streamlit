@@ -101,19 +101,24 @@ jobs:
 
         done
 
-    - name: Get Databricks ACCount Access Token using Service Principal
-      run: |
-        export CLIENT_ID=${{ secrets.DATABRICKS_CLIENT_ID_CICD }}
-        export CLIENT_SECRET=${{ secrets.DATABRICKS_CLIENT_SECRET_CICD }}
-        export TOKEN_ENDPOINT_URL="https://accounts.azuredatabricks.net/oidc/v1/token"
-        
-        DATABRICKS_TOKEN_ACCOUNT=$(curl --request POST \
-          --url "$TOKEN_ENDPOINT_URL" \
-          --user "$CLIENT_ID:$CLIENT_SECRET" \
-          --data 'grant_type=client_credentials&scope=all-apis' | jq -r .access_token)
-        
-        echo "DATABRICKS_TOKEN_ACCOUNT=$DATABRICKS_TOKEN_ACCOUNT" >> $GITHUB_ENV
 
+    - uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          token=$(az account get-access-token --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d --query accessToken -o tsv)
+
+          if [ -z "$token" ]; then
+            echo "Warning: Access token not set"
+          else
+            echo "Access token: $token"
+          fi
+    
 
       
 
@@ -121,6 +126,8 @@ jobs:
       env:
         DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN_ACCOUNT }}
         DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
+        
+
       run: |
       
 
@@ -133,7 +140,7 @@ jobs:
           echo "Adding service principal $SP_ID to group 'apps'"
           RESPONSE=$(curl --request PATCH \
             --url "https://accounts.azuredatabricks.net/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/scim/v2/Groups/$APPS_GROUP_ID" \
-            --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+            --header "Authorization: Bearer $token" \
             --header "Content-Type: application/json" \
             --data '{
               "schemas": [
