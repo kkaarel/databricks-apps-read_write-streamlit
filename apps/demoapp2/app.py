@@ -21,7 +21,7 @@ st.write(os.environ)
 DATABRICKS_WAREHOUSE_ID = st.text_input(
     "Enter Databricks Warehouse ID:",
     value=os.getenv('DATABRICKS_WAREHOUSE_ID', ''),
-    help="Please provide the Databricks Warehouse ID if it's not set as an environment variable."
+    help="Please provide the Databricks Warehouse ID if it's not set as an environment variable.👋"
 )
 
 if not DATABRICKS_WAREHOUSE_ID:
