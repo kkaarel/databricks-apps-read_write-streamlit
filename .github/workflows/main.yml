@@ -109,14 +109,31 @@ jobs:
 
         # List all apps and extract service_principal_ids
         SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_id')
+
+        APPS_GROUP_ID=$(databricks groups list | grep 'apps' | awk '{print $1}')
         # Add each service principal to the 'apps' group
         for SP_ID in $SERVICE_PRINCIPAL_IDS; do
           echo "Adding service principal $SP_ID to group 'apps'"
           RESPONSE=$(curl --request PATCH \
-            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/groups" \
+            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/preview/scim/v2/Groups/$APPS_GROUP_ID" \
             --header "Authorization: Bearer $DATABRICKS_TOKEN" \
             --header "Content-Type: application/json" \
-            --data "{\"group_name\": \"6862273038496\", \"member_id\": \"$SP_ID\"}")
+            --data '{
+              "schemas": [
+                "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+              ],
+              "Operations": [
+                {
+                  "op": "add",
+                  "path": "members",
+                  "value": [
+                    {
+                      "value": "'"$SP_ID"'"
+                    }
+                  ]
+                }
+              ]
+            }')
 
           echo "response=$RESPONSE" >> $GITHUB_ENV
           echo "$RESPONSE"
