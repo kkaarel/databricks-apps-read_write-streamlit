@@ -100,3 +100,24 @@ jobs:
           databricks apps deploy $app_name --source-code-path /Workspace/apps/$app_name
 
         done
+
+    - name: Get app Service principals and add to app group
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+      run: |
+
+        # List all apps and extract service_principal_ids
+        SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_id')
+        # Add each service principal to the 'apps' group
+        for SP_ID in $SERVICE_PRINCIPAL_IDS; do
+          echo "Adding service principal $SP_ID to group 'apps'"
+          RESPONSE=$(curl --request POST \
+            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/groups/add-member" \
+            --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data "{\"group_name\": \"apps\", \"member_id\": \"$SP_ID\"}")
+
+          echo "response=$RESPONSE" >> $GITHUB_ENV
+          echo "$RESPONSE"
+        done
