@@ -166,7 +166,7 @@ jobs:
                   ]
                 }
               ]
-            }')
+            }' 2>&1)
 
           echo "response=$RESPONSE" >> $GITHUB_ENV
           echo "$RESPONSE"
