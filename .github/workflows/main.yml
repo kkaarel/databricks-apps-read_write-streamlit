@@ -130,18 +130,27 @@ jobs:
 
 
       run: |
-      
+        echo "current user"
         databricks  current-user me  
+
         # List all apps and extract service_principal_ids
+        echo "servicr principal"
 
         SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_name')
 
+        echo " APPS_GROUP_ID"
+
         APPS_GROUP_ID=$(databricks groups list | grep 'apps' | awk '{print $1}')
+
+
         # Add each service principal to the 'apps' group
+
         for SP_ID in $SERVICE_PRINCIPAL_IDS; do
+
           echo "Adding service principal $SP_ID to group 'apps'"
+          
           RESPONSE=$(curl --request PATCH \
-            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/scim/v2/Groups/$APPS_GROUP_ID" \
+            --url "https://accounts.azuredatabricks.net/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/scim/v2/Groups/$APPS_GROUP_ID" \
             --header "Authorization: Bearer $DATABRICKS_TOKEN_ACCOUNT" \
             --header "Content-Type: application/json" \
             --data '{
