@@ -112,7 +112,7 @@ jobs:
         # Add each service principal to the 'apps' group
         for SP_ID in $SERVICE_PRINCIPAL_IDS; do
           echo "Adding service principal $SP_ID to group 'apps'"
-          RESPONSE=$(curl --request POST \
+          RESPONSE=$(curl --request PATCH \
             --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/groups/add-member" \
             --header "Authorization: Bearer $DATABRICKS_TOKEN" \
             --header "Content-Type: application/json" \
