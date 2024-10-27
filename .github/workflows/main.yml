@@ -41,8 +41,6 @@ jobs:
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
 
-    - name: Setup python
-      uses: actions/setup-python@v2
 
     - name: Databricks sync
       env:

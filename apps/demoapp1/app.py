@@ -60,12 +60,6 @@ def sqlQuery(query: str) -> pd.DataFrame:
         return pd.DataFrame()  # Return an empty DataFrame in case of error
 
 
-if 'stage' not in st.session_state:
-    st.session_state.stage = 0
-
-def set_state(i):
-    st.session_state.stage = i
-
 
 #@st.cache_data(ttl=600)  # IF you want to query realtime and see the changes using this is not smart
 def getData():
@@ -118,54 +112,7 @@ else:
             st.write("Updated Data:")
             st.write(data)
         
-#if st.session_state.stage == 0:
-#    st.button('Begin', on_click=set_state, args=[1])
 
-set_state(1)
-with st.expander("Add rows to data"):
-    if st.session_state.stage >= 1:
-        with st.form(key='user_form'):
-
-            inputs = {}
-            for column in data.columns:
-
-                if column != "Select":
-                    inputs[column] = st.text_input(label=column)
-
-
-            submit_button = st.form_submit_button(label='Submit', on_click=set_state, args=[2])
-
-
-        if submit_button:
-
-            user_input_data = pd.DataFrame([inputs])
-            st.write('Submitted Data:')
-            with st.spinner('Updating rows...'):
-            #st.write(user_input_data)
-                if st.session_state.stage >= 2:
-                    set_state(3)
-                        
-                    cfg = Config() 
-                    with sql.connect(
-                        server_hostname=cfg.host,
-                        http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
-                        credentials_provider=lambda: cfg.authenticate
-                    ) as connection:
-                        with connection.cursor() as cursor:
-                            
-                            try:
-                    
-                                table_name = "app_dev.default.people"
-
-                                cursor.execute(f"INSERT INTO {table_name} VALUES {tuple(user_input_data.iloc[0])}")
-
-                                data = getData()
-                                st.write(f"Data from {table_name}")
-                                st.write(data)
-
-                            except Exception as e:
-                                st.error(f"An error occurred while inserting data: {e}")
-                                st.stop()
 
 
 
