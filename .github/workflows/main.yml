@@ -171,12 +171,18 @@ jobs:
           echo "response=$RESPONSE" >> $GITHUB_ENV
           echo "$RESPONSE"
 
-          # Check if the response contains any error messages
-          if echo "$RESPONSE" | jq -e '.Errors' > /dev/null; then
-            echo "Error adding service principal $SP_ID to group 'apps':"
-            echo "$RESPONSE" | jq '.Errors'
+          # Check if the response is valid JSON
+          if echo "$RESPONSE" | jq . > /dev/null 2>&1; then
+            # Check if the response contains any error messages
+            if echo "$RESPONSE" | jq -e '.Errors' > /dev/null; then
+              echo "Error adding service principal $SP_ID to group 'apps':"
+              echo "$RESPONSE" | jq '.Errors'
+            else
+              echo "Successfully added service principal $SP_ID to group 'apps'"
+            fi
           else
-            echo "Successfully added service principal $SP_ID to group 'apps'"
+            echo "Invalid JSON response received:"
+            echo "$RESPONSE"
           fi
           
         done
