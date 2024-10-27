@@ -133,7 +133,8 @@ jobs:
       
         databricks  current-user me  
         # List all apps and extract service_principal_ids
-        SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_id')
+
+        SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_name')
 
         APPS_GROUP_ID=$(databricks groups list | grep 'apps' | awk '{print $1}')
         # Add each service principal to the 'apps' group
