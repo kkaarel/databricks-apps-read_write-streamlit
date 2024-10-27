@@ -103,9 +103,10 @@ jobs:
 
     - name: Get app Service principals and add to app group
       env:
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
         DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+        DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID }}
       run: |
+      
 
         # List all apps and extract service_principal_ids
         SERVICE_PRINCIPAL_IDS=$(databricks apps list | jq -r '.[].service_principal_id')
@@ -115,7 +116,7 @@ jobs:
         for SP_ID in $SERVICE_PRINCIPAL_IDS; do
           echo "Adding service principal $SP_ID to group 'apps'"
           RESPONSE=$(curl --request PATCH \
-            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/preview/scim/v2/Groups/$APPS_GROUP_ID" \
+            --url "https://accounts.azuredatabricks.net/api/2.0/accounts/${{ secrets.DATABRICKS_ACCOUNT_ID }}/scim/v2/Groups/$APPS_GROUP_ID" \
             --header "Authorization: Bearer $DATABRICKS_TOKEN" \
             --header "Content-Type: application/json" \
             --data '{
