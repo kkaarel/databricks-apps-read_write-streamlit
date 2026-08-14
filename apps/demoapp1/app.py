@@ -68,33 +68,38 @@ def get_connection():
     )
 
 
-def sql_query(query: str) -> pd.DataFrame:
+def sql_query(query: str, suppress_error: bool = False) -> pd.DataFrame:
     try:
         with get_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 return cursor.fetchall_arrow().to_pandas()
     except Exception as e:
-        st.error(f"An error occurred while executing query: {e}")
+        if not suppress_error:
+            err_msg = str(e)
+            if "INSUFFICIENT_PERMISSIONS" in err_msg or "42501" in err_msg:
+                st.error(f"🔒 **Unity Catalog Access Denied**: {err_msg}")
+            else:
+                st.error(f"An error occurred while executing query: {e}")
         return pd.DataFrame()
 
 
 def get_catalogs():
-    df = sql_query("SHOW CATALOGS")
+    df = sql_query("SHOW CATALOGS", suppress_error=True)
     if not df.empty:
         return df.iloc[:, 0].dropna().tolist()
     return []
 
 
 def get_schemas(catalog: str):
-    df = sql_query(f"SHOW SCHEMAS IN `{catalog}`")
+    df = sql_query(f"SHOW SCHEMAS IN `{catalog}`", suppress_error=True)
     if not df.empty:
         return df.iloc[:, 0].dropna().tolist()
     return []
 
 
 def get_tables(catalog: str, schema: str):
-    df = sql_query(f"SHOW TABLES IN `{catalog}`.`{schema}`")
+    df = sql_query(f"SHOW TABLES IN `{catalog}`.`{schema}`", suppress_error=True)
     if not df.empty:
         for col in df.columns:
             if "table" in col.lower():
@@ -140,7 +145,16 @@ data = get_data()
 st.write("This Streamlit app integrates with Databricks to allow logged-in users to view, update, and insert rows in reference tables.")
 
 if data.empty:
-    st.info("No data returned or table is empty.")
+    st.info(f"💡 **Permission Required for {full_table}**")
+    st.markdown(f"""
+    To grant access to this table in Databricks Unity Catalog, run the following SQL commands in your Databricks SQL Editor or Notebook:
+
+    ```sql
+    GRANT USE CATALOG ON CATALOG `{selected_catalog}` TO `adminsdbw`;
+    GRANT USE SCHEMA ON SCHEMA `{selected_catalog}`.`{selected_schema}` TO `adminsdbw`;
+    GRANT SELECT, UPDATE, INSERT ON TABLE {full_table} TO `adminsdbw`;
+    ```
+    """)
     st.stop()
 
 data["Select"] = False
