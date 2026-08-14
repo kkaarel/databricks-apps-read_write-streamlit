@@ -38,7 +38,7 @@ with st.expander("User info"):
 
 def get_connection():
     cfg = Config()
-    # Ensure server_hostname does not contain protocol prefixes
+    # Clean host to ensure no protocol prefix exists
     host = (cfg.host or "").replace("https://", "").replace("http://", "").rstrip("/")
     
     # Clean and format warehouse HTTP path
@@ -48,19 +48,7 @@ def get_connection():
     else:
         http_path = f"/sql/1.0/warehouses/{warehouse}"
 
-    headers = getattr(st, "context", None) and getattr(st.context, "headers", {}) or {}
-    user_token = headers.get("X-Forwarded-Access-Token") or headers.get("Authorization", "").replace("Bearer ", "")
-
-    if user_token:
-        try:
-            return sql.connect(
-                server_hostname=host,
-                http_path=http_path,
-                access_token=user_token
-            )
-        except Exception:
-            pass
-
+    # Authenticate as the App's Service Principal
     return sql.connect(
         server_hostname=host,
         http_path=http_path,
