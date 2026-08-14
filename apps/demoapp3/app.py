@@ -66,24 +66,56 @@ def sql_query(query: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-catalog_name = os.getenv("CATALOG_NAME", "")
-schema_name = os.getenv("SCHEMA_NAME", "")
-table_name = os.getenv("TABLE_NAME", "")
+def get_catalogs():
+    df = sql_query("SHOW CATALOGS")
+    if not df.empty:
+        return df.iloc[:, 0].dropna().tolist()
+    return []
 
-if not (catalog_name and schema_name and table_name):
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        catalog_name = st.text_input("Catalog", value=catalog_name, placeholder="catalog_name")
-    with col2:
-        schema_name = st.text_input("Schema", value=schema_name, placeholder="schema_name")
-    with col3:
-        table_name = st.text_input("Table", value=table_name, placeholder="table_name")
 
-if not (catalog_name and schema_name and table_name):
-    st.info("Please specify Catalog, Schema, and Table names to load data.")
+def get_schemas(catalog: str):
+    df = sql_query(f"SHOW SCHEMAS IN `{catalog}`")
+    if not df.empty:
+        return df.iloc[:, 0].dropna().tolist()
+    return []
+
+
+def get_tables(catalog: str, schema: str):
+    df = sql_query(f"SHOW TABLES IN `{catalog}`.`{schema}`")
+    if not df.empty:
+        for col in df.columns:
+            if "table" in col.lower():
+                return df[col].dropna().tolist()
+        return df.iloc[:, 1].dropna().tolist() if df.shape[1] > 1 else df.iloc[:, 0].dropna().tolist()
+    return []
+
+
+col1, col2, col3 = st.columns(3)
+
+catalogs = get_catalogs()
+
+if not catalogs:
+    st.warning("No catalogs accessible or error connecting to Databricks SQL Warehouse.")
     st.stop()
 
-full_table = f"`{catalog_name}`.`{schema_name}`.`{table_name}`"
+with col1:
+    selected_catalog = st.selectbox("Select Catalog", options=catalogs)
+
+schemas = get_schemas(selected_catalog) if selected_catalog else []
+
+with col2:
+    selected_schema = st.selectbox("Select Schema", options=schemas) if schemas else None
+
+tables = get_tables(selected_catalog, selected_schema) if (selected_catalog and selected_schema) else []
+
+with col3:
+    selected_table = st.selectbox("Select Table", options=tables) if tables else None
+
+if not (selected_catalog and selected_schema and selected_table):
+    st.info("Please select a Catalog, Schema, and Table to load data.")
+    st.stop()
+
+full_table = f"`{selected_catalog}`.`{selected_schema}`.`{selected_table}`"
 
 
 def get_data():
@@ -95,7 +127,7 @@ data = get_data()
 st.write("This Streamlit app integrates with Databricks to allow logged-in users to view, update, and insert rows in reference tables.")
 
 if data.empty:
-    st.info("No data returned. Ensure that the logged-in user has required Unity Catalog permissions (`USE CATALOG`, `USE SCHEMA`, `SELECT`) on the table.")
+    st.info("No data returned or table is empty.")
     st.stop()
 
 data["Select"] = False
