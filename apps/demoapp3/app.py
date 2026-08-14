@@ -38,21 +38,34 @@ with st.expander("User info"):
 
 def get_connection():
     cfg = Config()
+    # Ensure server_hostname does not contain protocol prefixes
+    host = (cfg.host or "").replace("https://", "").replace("http://", "").rstrip("/")
+    
+    # Clean and format warehouse HTTP path
+    warehouse = DATABRICKS_WAREHOUSE_ID.strip()
+    if warehouse.startswith("/sql/1.0/warehouses/"):
+        http_path = warehouse
+    else:
+        http_path = f"/sql/1.0/warehouses/{warehouse}"
+
     headers = getattr(st, "context", None) and getattr(st.context, "headers", {}) or {}
     user_token = headers.get("X-Forwarded-Access-Token") or headers.get("Authorization", "").replace("Bearer ", "")
 
     if user_token:
-        return sql.connect(
-            server_hostname=cfg.host,
-            http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
-            access_token=user_token
-        )
-    else:
-        return sql.connect(
-            server_hostname=cfg.host,
-            http_path=f"/sql/1.0/warehouses/{DATABRICKS_WAREHOUSE_ID}",
-            credentials_provider=lambda: cfg.authenticate
-        )
+        try:
+            return sql.connect(
+                server_hostname=host,
+                http_path=http_path,
+                access_token=user_token
+            )
+        except Exception:
+            pass
+
+    return sql.connect(
+        server_hostname=host,
+        http_path=http_path,
+        credentials_provider=lambda: cfg.authenticate
+    )
 
 
 def sql_query(query: str) -> pd.DataFrame:

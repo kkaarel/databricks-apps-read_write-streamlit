@@ -72,7 +72,8 @@ jobs:
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json" \
-          --data "{\"name\": \"$app_name\", \"default_source_code_path\": \"/Workspace/apps/$app_name\", \"resources\": [{\"name\": \"sql-warehouse\", \"sql_warehouse\": {\"id\": \"$SQL_WAREHOUSE\", \"permission\": \"CAN_MANAGE\"}}]}")
+          --data "{\"name\": \"$app_name\", \"default_source_code_path\": \"/Workspace/apps/$app_name\", \"resources\": [{\"name\": \"sql-warehouse\", \"sql_warehouse\": {\"id\": \"$SQL_WAREHOUSE\", \"permission\": \"CAN_MANAGE\"}}], \"forward_user_access_token\": true}")
+
 
         
           echo "Create app response: $RESPONSE"
