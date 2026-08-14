@@ -109,11 +109,22 @@ jobs:
             fi
           fi
 
+          # Grant permission to 'users' group so all workspace users can manage and access the app in the UI
+          echo "Granting permissions for app $app_name..."
+          PERM_RESPONSE=$(curl -s --request PATCH \
+            --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/permissions/apps/$app_name" \
+            --header "Authorization: Bearer $DATABRICKS_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data '{"access_control_list": [{"group_name": "users", "permission_level": "CAN_MANAGE"}]}')
+          echo "Permission response: $PERM_RESPONSE"
+
+
           # Deploy updated code to app
           echo "Deploying app $app_name..."
           databricks apps deploy $app_name --source-code-path /Workspace/apps/$app_name
 
         done
+
 
 
 
