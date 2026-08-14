@@ -1,3 +1,4 @@
-databricks
+databricks-sql-connector
 databricks-sdk
-requests
+streamlit
+pandas

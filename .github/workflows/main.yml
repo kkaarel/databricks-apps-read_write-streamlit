@@ -36,7 +36,7 @@ jobs:
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/workspace/mkdirs" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json" \
-          --data '{"path": "/apps"}')
+          --data '{"path": "/Workspace/apps"}')
 
         echo "response=$RESPONSE" >> $GITHUB_ENV
         echo "$RESPONSE"
@@ -49,10 +49,9 @@ jobs:
       run: |
         echo "Checking out the releases branch"
         databricks -v 
-        databricks sync ./apps/ /apps --full 
+        databricks sync ./apps/ /Workspace/apps --full 
 
 
-    
     - name: Create Databricks app if not exists
       env:
         DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
@@ -73,33 +72,48 @@ jobs:
           --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps" \
           --header "Authorization: Bearer $DATABRICKS_TOKEN" \
           --header "Content-Type: application/json" \
-          --data "{\"name\": \"$app_name\", \"default_source_code_path\": \"/apps/$app_name\", \"resources\": [{\"sql_warehouse\": {\"id\": \"$SQL_WAREHOUSE\", \"permission\": \"CAN_MANAGE\"}}]}")
+          --data "{\"name\": \"$app_name\", \"default_source_code_path\": \"/Workspace/apps/$app_name\", \"resources\": [{\"name\": \"sql-warehouse\", \"sql_warehouse\": {\"id\": \"$SQL_WAREHOUSE\", \"permission\": \"CAN_MANAGE\"}}]}")
 
         
-          echo "response=$RESPONSE" >> $GITHUB_ENV
-          echo "Create app $RESPONSE"
+          echo "Create app response: $RESPONSE"
 
           if echo "$RESPONSE" | grep -q "ALREADY_EXISTS"; then
             echo "App $app_name already exists. Skipping creation."
+          elif echo "$RESPONSE" | grep -q "error_code"; then
+            echo "Failed to create app $app_name:"
+            echo "$RESPONSE"
+            exit 1
           else
-            # Wait until the app is in the ACTIVE state
-            while true; do
-              APP_STATUS=$(curl --request GET \
+            echo "App creation initiated for $app_name. Polling for ACTIVE state..."
+            # Wait until the app is in the ACTIVE state (with timeout)
+            MAX_ATTEMPTS=30
+            ATTEMPT=0
+            while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+              APP_STATUS=$(curl -s --request GET \
                 --url "${{ secrets.DATABRICKS_HOST }}/api/2.0/apps/$app_name" \
-                --header "Authorization: Bearer $DATABRICKS_TOKEN" | jq -r .compute_status.state)
+                --header "Authorization: Bearer $DATABRICKS_TOKEN" | jq -r '.compute_status.state // .status.state // empty')
               
               if [[ "$APP_STATUS" == "ACTIVE" ]]; then
                 echo "App $app_name is ACTIVE"
                 break
               fi
               
-              echo "Waiting for app $app_name to become ACTIVE. Current state: $APP_STATUS"
-              sleep 30
+              echo "Waiting for app $app_name to become ACTIVE. Current state: ${APP_STATUS:-UNKNOWN} (Attempt $((ATTEMPT+1))/$MAX_ATTEMPTS)"
+              sleep 15
+              ATTEMPT=$((ATTEMPT+1))
             done
+
+            if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+              echo "Timed out waiting for app $app_name to become ACTIVE."
+              exit 1
+            fi
           fi
-          #This will make sure that the app will update
+
+          # Deploy updated code to app
+          echo "Deploying app $app_name..."
           databricks apps deploy $app_name --source-code-path /Workspace/apps/$app_name
 
         done
+
 
 
